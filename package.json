@@ -1,0 +1,86 @@
+{
+  "name": "petals",
+  "version": "0.2.0",
+  "description": "Desktop-first productivity app with task management and contribution heatmaps",
+  "main": "dist/electron/main.js",
+  "homepage": "./",
+  "scripts": {
+    "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "build": "vite build && tsc -p tsconfig.node.json && electron-builder",
+    "build:renderer": "vite build",
+    "build:electron": "tsc -p tsconfig.node.json",
+    "preview": "vite preview",
+    "electron": "electron .",
+    "type-check": "tsc --noEmit && tsc -p tsconfig.node.json --noEmit",
+    "lint": "eslint src electron --ext ts,tsx"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saidatta64/task-flow.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/saidatta64/task-flow/issues"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.8",
+    "@types/node": "^20.10.6",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@typescript-eslint/eslint-plugin": "^6.18.0",
+    "@typescript-eslint/parser": "^6.18.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "concurrently": "^8.2.2",
+    "drizzle-kit": "^0.20.14",
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react": "^7.33.2",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.8",
+    "wait-on": "^7.0.1"
+  },
+  "dependencies": {
+    "@heroui/react": "^3.2.2",
+    "autoprefixer": "^10.4.16",
+    "better-sqlite3": "^11.10.0",
+    "drizzle-orm": "^0.29.1",
+    "framer-motion": "^12.42.2",
+    "lucide-react": "^0.294.0",
+    "postcss": "^8.4.32",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "recharts": "^3.9.2",
+    "tailwindcss": "^3.4.1",
+    "zod": "^3.22.4",
+    "zustand": "^4.4.1"
+  },
+  "build": {
+    "appId": "com.taskflow.app",
+    "productName": "Petals",
+    "files": [
+      "dist/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "release",
+      "buildResources": "assets"
+    },
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "signingHashAlgorithms": null,
+      "sign": null
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

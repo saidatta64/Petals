@@ -1,0 +1,11 @@
+node_modules/
+dist/
+release/
+*.db
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+.cursor/
+.codex-plugin/

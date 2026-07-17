@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-family: Inter, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root {
+  --workspace-bg: #F4F4F5;
+  --workspace-sidebar: rgba(255, 255, 255, 0.75);
+  --workspace-card: rgba(255, 255, 255, 0.85);
+  --workspace-border: rgba(0, 0, 0, 0.08);
+  --workspace-text: #09090B;
+  --workspace-text-secondary: #71717A;
+}
+
+html.dark {
+  --workspace-bg: #09090B;
+  --workspace-sidebar: rgba(18, 18, 20, 0.82);
+  --workspace-card: rgba(30, 30, 35, 0.72);
+  --workspace-border: rgba(255, 255, 255, 0.06);
+  --workspace-text: #FAFAFA;
+  --workspace-text-secondary: #A1A1AA;
+}
+
+body {
+  background-color: theme('colors.workspace.bg');
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(79, 140, 255, 0.08), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(124, 92, 255, 0.08), transparent 25%);
+  color: theme('colors.workspace.text');
+  transition: background-color 0.2s, color 0.2s;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+
+body.dark {
+  background-color: theme('colors.workspace.bg');
+  color: theme('colors.workspace.text');
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+body.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+body.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+html.dark ::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
