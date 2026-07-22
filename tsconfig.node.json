@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "composite": true,
-    "tsBuildInfoFile": "./node_modules/.tsbuildinfo",
     "skipLibCheck": true,
     "module": "CommonJS",
     "moduleResolution": "node",

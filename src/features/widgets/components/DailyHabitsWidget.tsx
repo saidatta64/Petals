@@ -25,30 +25,35 @@ export const DailyHabitsWidget = () => {
   }
 
   return (
-    <Card className="w-full bg-workspace-card/60 backdrop-blur-md border border-workspace-border rounded-[24px] p-6 shadow-glass-card">
-      <h2 className="text-lg font-semibold mb-4 text-workspace-text-secondary">Daily Habits</h2>
+    <Card className="w-full bg-workspace-card/90 backdrop-blur-xl border border-workspace-border/60 rounded-2xl p-5 shadow-sm transition-all duration-200">
+      <h2 className="font-brand text-base font-bold text-workspace-text mb-3 tracking-tight">
+        Daily Habits
+      </h2>
       
-      <div className="space-y-3 mb-4">
+      <div className="space-y-1">
         {dailyTasks.map(task => {
           const isCompleted = task.status === 'COMPLETED'
           return (
-            <div key={task.id} className="flex items-center justify-between group">
-              <div className="flex items-center gap-3">
+            <div 
+              key={task.id} 
+              className="flex items-center justify-between p-2 rounded-xl hover:bg-workspace-border/30 transition-colors group"
+            >
+              <div className="flex items-center gap-3 min-w-0">
                 <button 
                   onClick={() => toggleHabit(task.id)}
-                  className="focus:outline-none"
+                  className="focus:outline-none flex-shrink-0 transition-transform active:scale-90"
                 >
                   {isCompleted ? (
-                    <CheckCircle2 size={20} className="text-workspace-green" />
+                    <CheckCircle2 size={19} className="text-workspace-green" />
                   ) : (
-                    <Circle size={20} className="text-workspace-text-secondary hover:text-workspace-primary transition-colors" />
+                    <Circle size={19} className="text-workspace-text-secondary/70 hover:text-workspace-primary transition-colors" />
                   )}
                 </button>
-                <div className="flex flex-col">
-                  <span className={`text-sm ${isCompleted ? 'text-workspace-text-secondary line-through' : 'text-workspace-text'}`}>
+                <div className="flex flex-col min-w-0">
+                  <span className={`text-sm font-medium truncate ${isCompleted ? 'text-workspace-text-secondary line-through' : 'text-workspace-text'}`}>
                     {task.title}
                   </span>
-                  <span className="text-[10px] text-workspace-text-secondary">
+                  <span className="text-[10px] font-medium text-workspace-text-secondary/70">
                     Resets at {String(Math.floor((task.recurringInterval || 0) / 60)).padStart(2, '0')}:{String((task.recurringInterval || 0) % 60).padStart(2, '0')}
                   </span>
                 </div>
@@ -56,7 +61,7 @@ export const DailyHabitsWidget = () => {
               
               <button 
                 onClick={() => removeTask(task.id)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-workspace-text-secondary hover:text-workspace-red focus:outline-none"
+                className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg text-workspace-text-secondary hover:text-workspace-red hover:bg-workspace-red/10 focus:outline-none flex-shrink-0 ml-2"
                 title="Delete habit"
               >
                 <Trash2 size={14} />
@@ -65,7 +70,7 @@ export const DailyHabitsWidget = () => {
           )
         })}
         {dailyTasks.length === 0 && (
-          <p className="text-sm text-workspace-text-secondary italic">No daily habits yet.</p>
+          <p className="text-sm text-workspace-text-secondary italic p-2">No daily habits yet.</p>
         )}
       </div>
     </Card>

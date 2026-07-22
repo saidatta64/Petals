@@ -7,6 +7,7 @@ import TasksView from '@features/tasks/components/TasksView'
 import TaskDialog from '@features/tasks/components/TaskDialog'
 import { useTaskStore } from '@shared/stores/taskStore'
 import { useCategoryStore } from '@shared/stores/categoryStore'
+import { useThemeStore } from '@shared/stores/themeStore'
 import CalendarView from '@features/calendar/components/CalendarView'
 import StatisticsView from '@features/statistics/components/StatisticsView'
 import SettingsView from '@features/settings/components/SettingsView'
@@ -25,8 +26,11 @@ type ViewType =
 
 function App() {
   const [currentView, setCurrentView] = useState<ViewType>('dashboard')
-  const [isDarkMode, setIsDarkMode] = useState(false)
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false)
+
+  const isDarkMode = useThemeStore((state) => state.isDarkMode)
+  const toggleTheme = useThemeStore((state) => state.toggleTheme)
+  const loadTheme = useThemeStore((state) => state.loadTheme)
 
   const loadTasks = useTaskStore((state) => state.loadTasks)
   const loadCategories = useCategoryStore((state) => state.loadCategories)
@@ -34,15 +38,7 @@ function App() {
   const getTasksByStatus = useTaskStore((state) => state.getTasksByStatus)
 
   useEffect(() => {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    setIsDarkMode(prefersDark)
-  }, [])
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', isDarkMode)
-  }, [isDarkMode])
-
-  useEffect(() => {
+    loadTheme()
     loadTasks()
     loadCategories()
     
@@ -56,7 +52,7 @@ function App() {
       }
     }
     loadStartupView()
-  }, [loadTasks, loadCategories])
+  }, [loadTheme, loadTasks, loadCategories])
 
   const renderView = () => {
     switch (currentView) {
@@ -101,7 +97,7 @@ function App() {
         fullBleed={currentView === 'notepad' || currentView === 'visuals'}
         sidebar={<ArcSidebar currentView={currentView} onViewChange={setCurrentView} />}
         header={
-          <MinimalHeader isDarkMode={isDarkMode} onToggleTheme={() => setIsDarkMode(!isDarkMode)} />
+          <MinimalHeader isDarkMode={isDarkMode} onToggleTheme={toggleTheme} />
         }
       >
         {renderView()}
@@ -112,3 +108,4 @@ function App() {
 }
 
 export default App
+

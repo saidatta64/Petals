@@ -34,9 +34,9 @@ export const FocusTaskCard: React.FC<TaskProps> = ({
       onHoverEnd={() => setIsHovered(false)}
     >
       <div 
-        className={`w-full bg-workspace-card/60 backdrop-blur-md border ${
-          isHovered ? 'border-workspace-primary/50 shadow-glass-card shadow-workspace-primary/10' : 'border-workspace-border'
-        } transition-all duration-300 rounded-[16px] overflow-hidden group cursor-pointer hover:bg-workspace-card`}
+        className={`w-full bg-workspace-card/90 backdrop-blur-xl border ${
+          isHovered ? 'border-workspace-primary/40 shadow-sm' : 'border-workspace-border/60'
+        } transition-all duration-200 rounded-xl overflow-hidden group cursor-pointer hover:bg-workspace-card`}
         onClick={() => onEdit(task.id)}
       >
         <div className="p-4 flex flex-row items-center gap-4">

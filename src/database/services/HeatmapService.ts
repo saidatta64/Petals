@@ -6,25 +6,32 @@ export interface HeatmapData {
   level: 0 | 1 | 2 | 3 | 4
 }
 
+export function getLocalDateString(d: Date | number): string {
+  const date = typeof d === 'number' ? new Date(d) : d
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 export class HeatmapService {
   static generateHeatmapData(days: number = 365): HeatmapData[] {
     const completedTasks = TaskRepository.getByStatus('COMPLETED')
     const heatmapMap = new Map<string, number>()
 
-    // Initialize all dates with 0
+    // Initialize all dates with 0 using local YYYY-MM-DD
     const today = new Date()
     for (let i = 0; i < days; i++) {
       const date = new Date(today)
       date.setDate(date.getDate() - i)
-      const dateStr = date.toISOString().split('T')[0]
+      const dateStr = getLocalDateString(date)
       heatmapMap.set(dateStr, 0)
     }
 
-    // Count completed tasks per day
+    // Count completed tasks per day using local YYYY-MM-DD
     for (const task of completedTasks) {
       if (task.completedAt) {
-        const date = new Date(task.completedAt)
-        const dateStr = date.toISOString().split('T')[0]
+        const dateStr = getLocalDateString(task.completedAt)
         if (heatmapMap.has(dateStr)) {
           heatmapMap.set(dateStr, (heatmapMap.get(dateStr) || 0) + 1)
         }

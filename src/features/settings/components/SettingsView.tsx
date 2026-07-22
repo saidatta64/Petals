@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useCategoryStore } from '@shared/stores/categoryStore'
+import { useThemeStore, ThemeMode } from '@shared/stores/themeStore'
 import { Trash2 } from 'lucide-react'
 
 export default function SettingsView() {
@@ -13,6 +14,9 @@ export default function SettingsView() {
   const categories = useCategoryStore((state) => state.categories)
   const createCategory = useCategoryStore((state) => state.createCategory)
   const deleteCategory = useCategoryStore((state) => state.deleteCategory)
+
+  const themeMode = useThemeStore((state) => state.themeMode)
+  const setThemeMode = useThemeStore((state) => state.setThemeMode)
 
   useEffect(() => {
     async function loadSettings() {
@@ -55,6 +59,7 @@ export default function SettingsView() {
       await window.taskflow.settings.set('notification_enabled', String(notificationsEnabled))
       await window.taskflow.settings.set('default_view', defaultView)
       await window.taskflow.settings.set('username', username.trim())
+      await window.taskflow.settings.set('default_theme', themeMode)
       setIsSaved(true)
       setTimeout(() => setIsSaved(false), 2000)
     }
@@ -98,6 +103,24 @@ export default function SettingsView() {
               }`}
             />
           </button>
+        </div>
+
+        <div className="border-t border-workspace-border pt-6 flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold text-workspace-text text-lg">Default Theme</h3>
+            <p className="text-sm text-workspace-text-secondary">
+              Choose your preferred visual theme appearance.
+            </p>
+          </div>
+          <select
+            value={themeMode}
+            onChange={(e) => setThemeMode(e.target.value as ThemeMode)}
+            className="bg-workspace-bg text-workspace-text border border-workspace-border rounded-xl px-4 py-2 text-sm outline-none cursor-pointer focus:ring-2 focus:ring-workspace-primary/50 transition-shadow"
+          >
+            <option value="system">System Default</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
         </div>
 
         <div className="border-t border-workspace-border pt-6 flex items-center justify-between">

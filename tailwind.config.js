@@ -66,7 +66,8 @@ module.exports = {
         '5xl': '48px',
       },
       fontFamily: {
-        sans: ['Inter', 'SF Pro Display', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'Inter', 'SF Pro Display', 'sans-serif'],
+        brand: ['Outfit', 'Plus Jakarta Sans', 'sans-serif'],
       },
       fontWeight: {
         normal: '400',
@@ -75,7 +76,8 @@ module.exports = {
         bold: '700',
       },
       boxShadow: {
-        'glass-card': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+        'glass-card': '0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03)',
+        'subtle': '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
       },
     },
   },

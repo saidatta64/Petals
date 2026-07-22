@@ -1,5 +1,6 @@
 import { TaskRepository } from '../repositories/TaskRepository'
 import { CategoryRepository } from '../repositories/CategoryRepository'
+import { getLocalDateString } from './HeatmapService'
 
 export interface DailyStats {
   date: string
@@ -40,18 +41,18 @@ export class StatisticsService {
     const allTasks = TaskRepository.getAll()
     const statsMap = new Map<string, { completed: number; pending: number }>()
 
-    // Initialize all dates
+    // Initialize all dates using local YYYY-MM-DD
     const today = new Date()
     for (let i = 0; i < days; i++) {
       const date = new Date(today)
       date.setDate(date.getDate() - i)
-      const dateStr = date.toISOString().split('T')[0]
+      const dateStr = getLocalDateString(date)
       statsMap.set(dateStr, { completed: 0, pending: 0 })
     }
 
-    // Count tasks
+    // Count tasks using local YYYY-MM-DD
     for (const task of allTasks) {
-      const createdDate = new Date(task.createdAt).toISOString().split('T')[0]
+      const createdDate = getLocalDateString(task.createdAt)
       if (statsMap.has(createdDate)) {
         const stats = statsMap.get(createdDate)!
         if (task.status === 'COMPLETED') {
@@ -109,18 +110,29 @@ export class StatisticsService {
 
   static getWeeklyStats() {
     const allTasks = TaskRepository.getAll()
-    const completed = allTasks.filter((t) => t.status === 'COMPLETED')
+    const now = new Date()
+    
+    // Start of current week (Sunday 00:00:00.000)
+    const startOfWeek = new Date(now)
+    startOfWeek.setHours(0, 0, 0, 0)
+    startOfWeek.setDate(now.getDate() - now.getDay())
+
+    // End of current week (Next Sunday 00:00:00.000)
+    const endOfWeek = new Date(startOfWeek)
+    endOfWeek.setDate(startOfWeek.getDate() + 7)
 
     const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
     const stats = new Map<string, number>()
-
     weekDays.forEach((day) => stats.set(day, 0))
 
-    for (const task of completed) {
-      if (task.completedAt) {
-        const date = new Date(task.completedAt)
-        const dayName = weekDays[date.getDay()]
-        stats.set(dayName, (stats.get(dayName) || 0) + 1)
+    for (const task of allTasks) {
+      if (task.status === 'COMPLETED' && task.completedAt) {
+        const compTime = typeof task.completedAt === 'number' ? task.completedAt : new Date(task.completedAt).getTime()
+        if (compTime >= startOfWeek.getTime() && compTime < endOfWeek.getTime()) {
+          const date = new Date(compTime)
+          const dayName = weekDays[date.getDay()]
+          stats.set(dayName, (stats.get(dayName) || 0) + 1)
+        }
       }
     }
 
@@ -132,21 +144,23 @@ export class StatisticsService {
 
   static getMonthlyStats() {
     const allTasks = TaskRepository.getAll()
-    const completed = allTasks.filter((t) => t.status === 'COMPLETED')
+    const now = new Date()
+    const currentYear = now.getFullYear()
 
     const months = [
       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ]
     const stats = new Map<string, number>()
-
     months.forEach((month) => stats.set(month, 0))
 
-    for (const task of completed) {
-      if (task.completedAt) {
-        const date = new Date(task.completedAt)
-        const monthName = months[date.getMonth()]
-        stats.set(monthName, (stats.get(monthName) || 0) + 1)
+    for (const task of allTasks) {
+      if (task.status === 'COMPLETED' && task.completedAt) {
+        const compDate = new Date(task.completedAt)
+        if (compDate.getFullYear() === currentYear) {
+          const monthName = months[compDate.getMonth()]
+          stats.set(monthName, (stats.get(monthName) || 0) + 1)
+        }
       }
     }
 

@@ -11,7 +11,7 @@ interface HeatmapProps {
   days?: number
 }
 
-const CELL_SIZE = 12
+const CELL_SIZE = 11
 const GAP = 3
 const COL_WIDTH = CELL_SIZE + GAP
 
@@ -87,17 +87,22 @@ export default function Heatmap({ days = 365 }: HeatmapProps) {
 
     const labels: { text: string; colIndex: number }[] = []
     let lastMonth = -1
+    let lastColIndex = -10
+
     for (let c = 0; c < cols.length; c++) {
       const firstReal = cols[c].find(cell => !cell.empty)
       if (firstReal) {
         const d = new Date(firstReal.date)
         const m = d.getMonth()
         if (m !== lastMonth) {
-          labels.push({
-            text: d.toLocaleDateString(undefined, { month: 'short' }),
-            colIndex: c,
-          })
-          lastMonth = m
+          if (c - lastColIndex >= 2 || c === 0) {
+            labels.push({
+              text: d.toLocaleDateString('en-US', { month: 'short' }),
+              colIndex: c,
+            })
+            lastMonth = m
+            lastColIndex = c
+          }
         }
       }
     }
@@ -107,11 +112,16 @@ export default function Heatmap({ days = 365 }: HeatmapProps) {
 
   const getLevelColor = (level: number) => {
     switch (level) {
-      case 1: return 'bg-emerald-200 dark:bg-emerald-900'
-      case 2: return 'bg-emerald-300 dark:bg-emerald-700'
-      case 3: return 'bg-emerald-500 dark:bg-emerald-500'
-      case 4: return 'bg-emerald-700 dark:bg-emerald-300'
-      default: return 'bg-zinc-200 dark:bg-zinc-800'
+      case 1:
+        return 'bg-emerald-200 dark:bg-[#0e4429] hover:opacity-90'
+      case 2:
+        return 'bg-emerald-400 dark:bg-[#006d32] hover:opacity-90'
+      case 3:
+        return 'bg-emerald-600 dark:bg-[#26a641] hover:opacity-90'
+      case 4:
+        return 'bg-emerald-700 dark:bg-[#39d353] hover:opacity-90 shadow-[0_0_6px_rgba(57,211,83,0.35)]'
+      default:
+        return 'bg-zinc-200/90 dark:bg-[#161b22] border border-black/5 dark:border-white/[0.03] hover:bg-zinc-300 dark:hover:bg-[#262c36]'
     }
   }
 
@@ -139,7 +149,7 @@ export default function Heatmap({ days = 365 }: HeatmapProps) {
 
   return (
     <div className="relative" data-heatmap-root>
-      {/* Floating tooltip - rendered at the root level to avoid clipping */}
+      {/* Floating tooltip */}
       {tooltip && (
         <div
           className="absolute pointer-events-none z-50 -translate-x-1/2 -translate-y-full"
@@ -156,15 +166,15 @@ export default function Heatmap({ days = 365 }: HeatmapProps) {
       )}
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-        <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1">
-          <h2 className="text-base font-semibold text-workspace-text">Consistency Graph</h2>
-          <div className="flex items-center gap-4 text-xs text-workspace-text-secondary">
-            <span>
-              Total active days: <strong className="text-workspace-text">{stats.activeDays}</strong>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="font-brand text-base font-bold text-workspace-text">Consistency Graph</h2>
+          <div className="flex items-center gap-2">
+            <span className="bg-workspace-bg/80 border border-workspace-border/60 text-workspace-text-secondary text-xs px-3 py-1 rounded-full font-medium shadow-xs">
+              Active days: <strong className="text-workspace-text font-bold ml-1">{stats.activeDays}</strong>
             </span>
-            <span>
-              Max streak: <strong className="text-workspace-text">{stats.maxStreak}</strong>
+            <span className="bg-workspace-bg/80 border border-workspace-border/60 text-workspace-text-secondary text-xs px-3 py-1 rounded-full font-medium shadow-xs">
+              Max streak: <strong className="text-workspace-text font-bold ml-1">{stats.maxStreak} 🔥</strong>
             </span>
           </div>
         </div>
@@ -172,7 +182,7 @@ export default function Heatmap({ days = 365 }: HeatmapProps) {
         <select
           value={range}
           onChange={(e) => setRange(Number(e.target.value))}
-          className="bg-workspace-bg border border-workspace-border text-workspace-text rounded-lg px-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-workspace-primary/50 cursor-pointer self-start sm:self-auto"
+          className="bg-workspace-bg border border-workspace-border text-workspace-text rounded-xl px-3.5 py-1.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-workspace-primary/40 cursor-pointer self-start sm:self-auto shadow-xs transition-shadow"
         >
           <option value={90}>90 Days</option>
           <option value={180}>6 Months</option>
@@ -180,15 +190,15 @@ export default function Heatmap({ days = 365 }: HeatmapProps) {
         </select>
       </div>
 
-      {/* Grid */}
-      <div className="overflow-x-auto pb-2">
+      {/* Grid - Centered Container */}
+      <div className="overflow-x-auto pb-2 flex justify-start xl:justify-center w-full">
         <div className="inline-flex gap-0">
           {/* Day-of-week labels */}
-          <div className="flex flex-col mr-2 pt-[20px]" style={{ gap: `${GAP}px` }}>
+          <div className="flex flex-col mr-2 pt-[18px]" style={{ gap: `${GAP}px` }}>
             {dayLabels.map((label, i) => (
               <div
                 key={i}
-                className="text-[10px] text-workspace-text-secondary leading-none flex items-center justify-end pr-1"
+                className="text-[10px] text-workspace-text-secondary leading-none flex items-center justify-end pr-1 font-medium select-none"
                 style={{ height: `${CELL_SIZE}px`, width: '28px' }}
               >
                 {label}
@@ -203,7 +213,7 @@ export default function Heatmap({ days = 365 }: HeatmapProps) {
               {monthLabels.map((label, idx) => (
                 <span
                   key={`${label.text}-${idx}`}
-                  className="absolute text-[10px] text-workspace-text-secondary leading-none"
+                  className="absolute text-[10px] font-medium text-workspace-text-secondary leading-none select-none"
                   style={{ left: `${label.colIndex * COL_WIDTH}px` }}
                 >
                   {label.text}
@@ -228,7 +238,7 @@ export default function Heatmap({ days = 365 }: HeatmapProps) {
                     return (
                       <div
                         key={cell.date}
-                        className={`rounded-[2px] cursor-pointer transition-all duration-100 hover:ring-2 hover:ring-workspace-text/30 hover:ring-offset-1 hover:ring-offset-transparent ${getLevelColor(cell.level)}`}
+                        className={`rounded-[2px] cursor-pointer transition-transform duration-100 hover:scale-125 hover:z-10 ${getLevelColor(cell.level)}`}
                         style={{ width: CELL_SIZE, height: CELL_SIZE }}
                         onMouseEnter={(e) => handleCellHover(e, cell)}
                         onMouseLeave={() => setTooltip(null)}
@@ -243,13 +253,13 @@ export default function Heatmap({ days = 365 }: HeatmapProps) {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-end gap-1.5 text-[10px] text-workspace-text-secondary mt-2">
+      <div className="flex items-center justify-end gap-1.5 text-[10px] font-medium text-workspace-text-secondary mt-3 select-none">
         <span>Less</span>
-        <div className="w-[10px] h-[10px] rounded-[2px] bg-zinc-200 dark:bg-zinc-800" />
-        <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-200 dark:bg-emerald-900" />
-        <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-300 dark:bg-emerald-700" />
-        <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-500 dark:bg-emerald-500" />
-        <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-700 dark:bg-emerald-300" />
+        <div className="w-[10px] h-[10px] rounded-[2px] bg-zinc-200/90 dark:bg-[#161b22] border border-black/5 dark:border-white/[0.03]" />
+        <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-200 dark:bg-[#0e4429]" />
+        <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-400 dark:bg-[#006d32]" />
+        <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-600 dark:bg-[#26a641]" />
+        <div className="w-[10px] h-[10px] rounded-[2px] bg-emerald-700 dark:bg-[#39d353]" />
         <span>More</span>
       </div>
     </div>

@@ -95,28 +95,35 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-12">
-      {/* Hero Section */}
-      <section className="flex flex-col gap-4">
-        <h1 className="text-4xl font-semibold tracking-tight text-workspace-text">
-          Oyee, {username || 'friend'} 👋
-        </h1>
-        <p className="text-workspace-text-secondary text-lg max-w-2xl">
-          You have {pendingCount > 0 ? pendingCount : 'no'} pending tasks today. 
-          {pendingCount > 0 ? ` Complete ${pendingCount} more to keep your ${currentStreak > 0 ? currentStreak + '-day ' : ''}streak alive.` : " Enjoy your evening."}
-        </p>
-        <div className="flex items-center gap-4 mt-6">
-          <Button 
-            onPress={() => {
-              setTaskToEdit(null)
-              setIsTaskDialogOpen(true)
-            }}
-            className="h-14 px-6 font-bold text-base rounded-xl bg-workspace-card border border-workspace-border text-workspace-text hover:bg-workspace-border/60 hover:text-workspace-text transition-all flex items-center justify-center gap-3 shadow-sm"
-          >
-            <div className="w-5 h-5 rounded-full bg-workspace-primary/20 flex items-center justify-center text-workspace-primary">
-               +
-            </div>
-            New Task
-          </Button>
+      {/* Hero Section with Streak Widget on the Right */}
+      <section className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="flex flex-col gap-3 flex-1 min-w-0">
+          <h1 className="text-4xl font-bold tracking-tight text-workspace-text font-brand">
+            Oyee, {username || 'friend'} 👋
+          </h1>
+          <p className="text-workspace-text-secondary text-base max-w-xl leading-relaxed">
+            You have {pendingCount > 0 ? pendingCount : 'no'} pending tasks today. 
+            {pendingCount > 0 ? ` Complete ${pendingCount} more to keep your ${currentStreak > 0 ? currentStreak + '-day ' : ''}streak alive.` : " Enjoy your evening."}
+          </p>
+          <div className="flex items-center gap-4 mt-2">
+            <Button 
+              onPress={() => {
+                setTaskToEdit(null)
+                setIsTaskDialogOpen(true)
+              }}
+              className="h-11 px-5 font-bold text-sm rounded-xl bg-workspace-card border border-workspace-border text-workspace-text hover:bg-workspace-border/60 hover:text-workspace-text transition-all flex items-center justify-center gap-2.5 shadow-sm"
+            >
+              <div className="w-4 h-4 rounded-full bg-workspace-primary/20 flex items-center justify-center text-workspace-primary font-bold text-xs">
+                 +
+              </div>
+              New Task
+            </Button>
+          </div>
+        </div>
+
+        {/* Streak Widget placed on the right side of Hero */}
+        <div className="w-full md:w-80 flex-shrink-0">
+          <StreakWidget currentStreak={currentStreak} />
         </div>
       </section>
 
@@ -165,13 +172,6 @@ export default function Dashboard() {
         {/* Right Column: Widgets */}
         <div className="space-y-6">
           <DailyHabitsWidget />
-
-          <section>
-            <h2 className="text-lg font-semibold mb-4 text-workspace-text-secondary">Activity</h2>
-            <div className="mb-4">
-              <StreakWidget currentStreak={currentStreak} />
-            </div>
-          </section>
         </div>
 
       </div>

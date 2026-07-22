@@ -1,6 +1,6 @@
 {
   "name": "petals",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Desktop-first productivity app with task management and contribution heatmaps",
   "main": "dist/electron/main.js",
   "homepage": "./",
@@ -16,13 +16,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/saidatta64/task-flow.git"
+    "url": "git+https://github.com/saidatta64/Petals.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/saidatta64/task-flow/issues"
+    "url": "https://github.com/saidatta64/Petals/issues"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.8",
@@ -70,7 +70,7 @@
       "buildResources": "assets"
     },
     "win": {
-      "icon": "assets/icon.ico",
+      "icon": "assets/icon.png",
       "target": [
         "nsis",
         "portable"

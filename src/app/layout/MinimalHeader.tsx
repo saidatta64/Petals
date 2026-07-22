@@ -118,12 +118,12 @@ export const MinimalHeader: React.FC<MinimalHeaderProps> = ({ isDarkMode, onTogg
             }}
             onFocus={() => setIsOpen(true)}
             onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-            placeholder="Search tasks or jump to... (⌘K)"
+            placeholder="Search tasks or jump to... "
             className="w-full bg-workspace-bg border border-workspace-border text-workspace-text rounded-xl pl-10 pr-12 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-workspace-primary/50 transition-shadow shadow-sm placeholder:text-workspace-text-secondary/50"
           />
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
             <kbd className="hidden sm:inline-block border border-workspace-border rounded-md px-2 py-0.5 text-[10px] font-bold text-workspace-text-secondary bg-workspace-card/50">
-              ⌘K
+              Ctrl+K
             </kbd>
           </div>
 

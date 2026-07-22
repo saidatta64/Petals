@@ -10,8 +10,8 @@ interface WorkspaceLayoutProps {
 export const WorkspaceLayout: React.FC<WorkspaceLayoutProps & { fullBleed?: boolean }> = ({ sidebar, header, children, fullBleed }) => {
   return (
     <div className="min-h-screen bg-transparent flex overflow-hidden">
-      {/* Floating Sidebar */}
-      <div className="h-screen p-4 flex-shrink-0 z-40">
+      {/* Sidebar Container */}
+      <div className="h-screen flex-shrink-0 z-40">
         {sidebar}
       </div>
 

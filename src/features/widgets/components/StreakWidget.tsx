@@ -7,26 +7,26 @@ interface StreakWidgetProps {
 
 export const StreakWidget: React.FC<StreakWidgetProps> = ({ currentStreak }) => {
   return (
-    <div className="bg-workspace-card/60 backdrop-blur-md border border-workspace-border rounded-[24px] p-6 flex items-center justify-between hover:bg-workspace-card transition-colors">
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-[14px] bg-workspace-warning/10 flex items-center justify-center border border-workspace-warning/20">
-          <Flame className="text-workspace-warning drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]" size={24} />
+    <div className="bg-workspace-card/90 backdrop-blur-xl border border-workspace-border/60 rounded-2xl p-5 flex items-center justify-between hover:border-workspace-border transition-all duration-200 shadow-sm">
+      <div className="flex items-center gap-3.5">
+        <div className="w-11 h-11 rounded-xl bg-workspace-warning/10 flex items-center justify-center border border-workspace-warning/20">
+          <Flame className="text-workspace-warning" size={22} />
         </div>
         <div>
-          <p className="text-workspace-text-secondary text-sm font-medium">Current Streak</p>
-          <div className="flex items-baseline gap-1">
-            <p className="text-2xl font-bold text-workspace-text tracking-tight">{currentStreak}</p>
-            <p className="text-sm font-medium text-workspace-text-secondary">Days</p>
+          <p className="text-workspace-text-secondary text-xs font-semibold uppercase tracking-wider">Current Streak</p>
+          <div className="flex items-baseline gap-1 mt-0.5">
+            <p className="font-brand text-2xl font-bold text-workspace-text tracking-tight">{currentStreak}</p>
+            <p className="text-xs font-medium text-workspace-text-secondary">Days</p>
           </div>
         </div>
       </div>
       
-      {/* Mini Activity Chart placeholder (Optional depending on design) */}
-      <div className="flex items-end gap-1 h-8">
+      {/* Mini Activity Chart */}
+      <div className="flex items-end gap-1.5 h-8">
         {[4, 7, 5, 8, 3, 9, 6].map((val, i) => (
           <div 
             key={i} 
-            className="w-1.5 bg-workspace-warning/50 rounded-t-sm transition-all"
+            className="w-1.5 bg-workspace-warning/40 rounded-full transition-all"
             style={{ height: `${(val / 10) * 100}%` }}
           />
         ))}

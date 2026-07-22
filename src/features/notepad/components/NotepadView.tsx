@@ -36,7 +36,7 @@ export default function NotepadView() {
   const [editorTitle, setEditorTitle] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'idle'>('idle')
-  const [viewMode, setViewMode] = useState<'write' | 'preview'>('write')
+  const [viewMode, setViewMode] = useState<'preview' | 'write'>('preview')
   const [showHeadingDropdown, setShowHeadingDropdown] = useState(false)
   const [showListDropdown, setShowListDropdown] = useState(false)
 
@@ -112,8 +112,6 @@ export default function NotepadView() {
   const selectNote = async (note: NoteFile) => {
     setActiveNotePath(note.path)
     setEditorTitle(note.filename.replace('.txt', ''))
-    setViewMode('write')
-    
     if (note.isExternal && note.content !== undefined) {
       setEditorContent(note.content)
     } else if (window.taskflow) {
@@ -150,12 +148,12 @@ export default function NotepadView() {
   }
 
   const triggerAutosave = (title: string, content: string) => {
-    setSaveStatus('saving')
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
 
     saveTimeoutRef.current = setTimeout(async () => {
       if (!window.taskflow || !activeNotePath) return
-      
+      setSaveStatus('saving')
+
       const activeNote = notes.find(n => n.path === activeNotePath)
       if (!activeNote) return
 
@@ -193,8 +191,8 @@ export default function NotepadView() {
       }
       
       setSaveStatus('saved')
-      setTimeout(() => setSaveStatus('idle'), 1500)
-    }, 800)
+      setTimeout(() => setSaveStatus('idle'), 2500)
+    }, 2000) // 2 second natural pause delay
   }
 
   const handleCreateNote = async () => {
@@ -221,6 +219,7 @@ export default function NotepadView() {
     const newlyCreated = allNotes.find(n => n.filename === filename)
     if (newlyCreated) {
       selectNote(newlyCreated)
+      setViewMode('write')
     }
   }
 
@@ -308,7 +307,52 @@ export default function NotepadView() {
   }
 
   // --- Markdown Formatting Toolbar Helpers ---
-  const insertFormatting = (prefix: string, suffix: string = '') => {
+  const applyLinePrefix = (prefix: string) => {
+    if (viewMode !== 'write') {
+      setViewMode('write')
+    }
+    const textarea = textareaRef.current
+    if (!textarea) return
+
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const text = textarea.value
+
+    const lineStart = text.lastIndexOf('\n', start - 1) + 1
+    let lineEnd = text.indexOf('\n', end)
+    if (lineEnd === -1) lineEnd = text.length
+
+    const selectedText = text.substring(lineStart, lineEnd)
+    const lines = selectedText.split('\n')
+
+    const newLines = lines.map((line, idx) => {
+      const cleanLine = line.replace(/^(#{1,6}\s+|[-*+]\s+|\d+\.\s+)/, '')
+      if (prefix === '') {
+        return cleanLine
+      }
+      if (prefix === '1. ') {
+        return `${idx + 1}. ${cleanLine}`
+      }
+      if (line.startsWith(prefix)) {
+        return cleanLine
+      }
+      return `${prefix}${cleanLine}`
+    })
+
+    const replacement = newLines.join('\n')
+    const newContent = text.substring(0, lineStart) + replacement + text.substring(lineEnd)
+    handleContentChange(newContent)
+
+    setTimeout(() => {
+      textarea.focus()
+      textarea.setSelectionRange(lineStart, lineStart + replacement.length)
+    }, 10)
+  }
+
+  const insertInlineFormatting = (prefix: string, suffix: string, defaultPlaceholder: string = 'text') => {
+    if (viewMode !== 'write') {
+      setViewMode('write')
+    }
     const textarea = textareaRef.current
     if (!textarea) return
 
@@ -316,235 +360,259 @@ export default function NotepadView() {
     const end = textarea.selectionEnd
     const text = textarea.value
     const selected = text.substring(start, end)
-    
+
     let replacement = ''
+    let selectStart = 0
+    let selectEnd = 0
+
     if (selected) {
-      replacement = prefix + selected + suffix
+      if (selected.startsWith(prefix) && selected.endsWith(suffix) && selected.length >= prefix.length + suffix.length) {
+        replacement = selected.substring(prefix.length, selected.length - suffix.length)
+        selectStart = start
+        selectEnd = start + replacement.length
+      } else {
+        replacement = prefix + selected + suffix
+        selectStart = start
+        selectEnd = start + replacement.length
+      }
     } else {
-      // If nothing selected, insert placeholder text
-      replacement = prefix + (suffix ? 'text' : '') + suffix
+      replacement = prefix + defaultPlaceholder + suffix
+      selectStart = start + prefix.length
+      selectEnd = selectStart + defaultPlaceholder.length
     }
 
     const newContent = text.substring(0, start) + replacement + text.substring(end)
     handleContentChange(newContent)
 
-    // Reset cursor position
     setTimeout(() => {
       textarea.focus()
-      const newCursorStart = start + prefix.length
-      const newCursorEnd = start + prefix.length + (selected ? selected.length : (suffix ? 4 : 0))
-      textarea.setSelectionRange(newCursorStart, newCursorEnd)
+      textarea.setSelectionRange(selectStart, selectEnd)
     }, 10)
   }
 
   const handleHeadingSelection = (headingLevel: number) => {
     setShowHeadingDropdown(false)
     if (headingLevel === 0) {
-      // Paragraph format: strip leading hash formatting
-      const textarea = textareaRef.current
-      if (!textarea) return
-      const start = textarea.selectionStart
-      const text = textarea.value
-      const lineStart = text.lastIndexOf('\n', start - 1) + 1
-      const lineEnd = text.indexOf('\n', start)
-      const targetEnd = lineEnd === -1 ? text.length : lineEnd
-      const lineText = text.substring(lineStart, targetEnd)
-      const cleanedLine = lineText.replace(/^#+\s+/, '')
-      
-      const newContent = text.substring(0, lineStart) + cleanedLine + text.substring(targetEnd)
-      handleContentChange(newContent)
+      applyLinePrefix('')
     } else {
-      insertFormatting('#'.repeat(headingLevel) + ' ', '')
+      applyLinePrefix('#'.repeat(headingLevel) + ' ')
     }
   }
 
   const handleListSelection = (listType: 'bullet' | 'number') => {
     setShowListDropdown(false)
     if (listType === 'bullet') {
-      insertFormatting('- ', '')
+      applyLinePrefix('- ')
     } else {
-      insertFormatting('1. ', '')
+      applyLinePrefix('1. ')
     }
   }
 
-
   const insertLink = () => {
-    insertFormatting('[', '](https://example.com)')
+    insertInlineFormatting('[', '](https://example.com)', 'link text')
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter') {
+      const textarea = textareaRef.current
+      if (!textarea) return
+
+      const start = textarea.selectionStart
+      const text = textarea.value
+      const lineStart = text.lastIndexOf('\n', start - 1) + 1
+      const currentLine = text.substring(lineStart, start)
+
+      const bulletMatch = currentLine.match(/^([-*+])\s+(.*)/)
+      if (bulletMatch) {
+        const symbol = bulletMatch[1]
+        const content = bulletMatch[2].trim()
+
+        if (content === '') {
+          e.preventDefault()
+          const newText = text.substring(0, lineStart) + text.substring(start)
+          handleContentChange(newText)
+          setTimeout(() => {
+            textarea.focus()
+            textarea.setSelectionRange(lineStart, lineStart)
+          }, 10)
+        } else {
+          e.preventDefault()
+          const nextBullet = `\n${symbol} `
+          const newText = text.substring(0, start) + nextBullet + text.substring(start)
+          handleContentChange(newText)
+          setTimeout(() => {
+            textarea.focus()
+            const newPos = start + nextBullet.length
+            textarea.setSelectionRange(newPos, newPos)
+          }, 10)
+        }
+        return
+      }
+
+      const numberMatch = currentLine.match(/^(\d+)\.\s+(.*)/)
+      if (numberMatch) {
+        const num = parseInt(numberMatch[1], 10)
+        const content = numberMatch[2].trim()
+
+        if (content === '') {
+          e.preventDefault()
+          const newText = text.substring(0, lineStart) + text.substring(start)
+          handleContentChange(newText)
+          setTimeout(() => {
+            textarea.focus()
+            textarea.setSelectionRange(lineStart, lineStart)
+          }, 10)
+        } else {
+          e.preventDefault()
+          const nextNumber = `\n${num + 1}. `
+          const newText = text.substring(0, start) + nextNumber + text.substring(start)
+          handleContentChange(newText)
+          setTimeout(() => {
+            textarea.focus()
+            const newPos = start + nextNumber.length
+            textarea.setSelectionRange(newPos, newPos)
+          }, 10)
+        }
+        return
+      }
+    }
+  }
 
   // --- Simple Markdown Parser for Preview Pane ---
+  const parseInlineStyles = (text: string): React.ReactNode => {
+    if (!text) return null
+
+    const regex = /(\*\*(.*?)\*\*|\*(.*?)\*|~~(.*?)~~|`(.*?)`|\[(.*?)\]\((.*?)\))/g
+    const elements: React.ReactNode[] = []
+    let lastIndex = 0
+    let match: RegExpExecArray | null
+
+    while ((match = regex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        elements.push(text.substring(lastIndex, match.index))
+      }
+
+      const [, , boldText, italicText, strikeText, codeText, linkText, linkUrl] = match
+
+      if (boldText !== undefined) {
+        elements.push(<strong key={`b-${match.index}`} className="font-bold text-workspace-text">{boldText}</strong>)
+      } else if (italicText !== undefined) {
+        elements.push(<em key={`i-${match.index}`} className="italic text-workspace-text">{italicText}</em>)
+      } else if (strikeText !== undefined) {
+        elements.push(<span key={`s-${match.index}`} className="line-through text-workspace-text-secondary/80">{strikeText}</span>)
+      } else if (codeText !== undefined) {
+        elements.push(<code key={`c-${match.index}`} className="bg-workspace-border/60 text-workspace-primary px-1.5 py-0.5 rounded text-xs font-mono">{codeText}</code>)
+      } else if (linkText !== undefined) {
+        elements.push(
+          <a key={`l-${match.index}`} href={linkUrl} target="_blank" rel="noopener noreferrer" className="text-workspace-primary underline font-medium hover:opacity-80">
+            {linkText}
+          </a>
+        )
+      }
+      lastIndex = regex.lastIndex
+    }
+
+    if (lastIndex < text.length) {
+      elements.push(text.substring(lastIndex))
+    }
+
+    return elements.length > 0 ? elements : text
+  }
+
   const renderMarkdown = (markdownText: string) => {
     if (!markdownText) return <p className="text-workspace-text-secondary italic">Start typing to see preview...</p>
 
     const lines = markdownText.split('\n')
+    const blocks: React.ReactNode[] = []
+    let currentList: { type: 'ul' | 'ol'; items: string[] } | null = null
 
-    return lines.map((line, idx) => {
-      // Headings
-      if (line.startsWith('# ')) {
-        return <h1 key={idx} className="text-2xl font-bold text-workspace-text mt-4 mb-2 border-b border-workspace-border pb-1">{parseInlineStyles(line.slice(2))}</h1>
-      }
-      if (line.startsWith('## ')) {
-        return <h2 key={idx} className="text-xl font-bold text-workspace-text mt-3 mb-1.5">{parseInlineStyles(line.slice(3))}</h2>
-      }
-      if (line.startsWith('### ')) {
-        return <h3 key={idx} className="text-lg font-bold text-workspace-text mt-2.5 mb-1">{parseInlineStyles(line.slice(4))}</h3>
-      }
-
-      // Horizontal rule
-      if (line.trim() === '---' || line.trim() === '***') {
-        return <hr key={idx} className="border-workspace-border my-4" />
-      }
-
-      // Blockquotes
-      if (line.startsWith('> ')) {
-        return <blockquote key={idx} className="border-l-4 border-workspace-primary/50 pl-4 py-1 my-2 bg-workspace-card/25 rounded-r-lg italic text-workspace-text-secondary text-sm">{parseInlineStyles(line.slice(2))}</blockquote>
-      }
-
-      // Lists
-      if (line.startsWith('- ') || line.startsWith('* ')) {
-        return (
-          <ul key={idx} className="list-disc list-inside ml-4 text-sm text-workspace-text space-y-1 my-1">
-            <li>{parseInlineStyles(line.slice(2))}</li>
+    const flushList = (key: string | number) => {
+      if (!currentList) return
+      if (currentList.type === 'ul') {
+        blocks.push(
+          <ul key={`ul-${key}`} className="list-disc list-inside ml-2 my-2 space-y-1 text-sm text-workspace-text">
+            {currentList.items.map((item, i) => (
+              <li key={i}>{parseInlineStyles(item)}</li>
+            ))}
           </ul>
         )
-      }
-      
-      // Ordered lists
-      const oListMatch = line.match(/^(\d+)\.\s+(.*)/)
-      if (oListMatch) {
-        return (
-          <ol key={idx} className="list-decimal list-inside ml-4 text-sm text-workspace-text space-y-1 my-1">
-            <li>{parseInlineStyles(oListMatch[2])}</li>
+      } else {
+        blocks.push(
+          <ol key={`ol-${key}`} className="list-decimal list-inside ml-2 my-2 space-y-1 text-sm text-workspace-text">
+            {currentList.items.map((item, i) => (
+              <li key={i}>{parseInlineStyles(item)}</li>
+            ))}
           </ol>
         )
       }
+      currentList = null
+    }
 
-      // Empty line
-      if (line.trim() === '') {
-        return <div key={idx} className="h-2" />
-      }
+    lines.forEach((line, idx) => {
+      const trimmed = line.trim()
 
-      // Paragraph / Default line
-      return <p key={idx} className="text-sm text-workspace-text leading-relaxed my-1">{parseInlineStyles(line)}</p>
-    })
-  }
-
-  // Parse Bold, Italic, Strikethrough, Code and Links
-  const parseInlineStyles = (text: string) => {
-    let parts: React.ReactNode[] = [text]
-
-    // Parse Bold: **text**
-    parts = parts.flatMap((part) => {
-      if (typeof part !== 'string') return part
-      const regex = /\*\*(.*?)\*\*/g
-      const result = []
-      let lastIndex = 0
-      let match
-      while ((match = regex.exec(part)) !== null) {
-        if (match.index > lastIndex) {
-          result.push(part.substring(lastIndex, match.index))
+      if (line.startsWith('- ') || line.startsWith('* ') || line.startsWith('+ ')) {
+        const itemContent = line.slice(2)
+        if (!currentList || currentList.type !== 'ul') {
+          flushList(idx)
+          currentList = { type: 'ul', items: [itemContent] }
+        } else {
+          currentList.items.push(itemContent)
         }
-        result.push(<strong key={match.index} className="font-bold text-workspace-text">{match[1]}</strong>)
-        lastIndex = regex.lastIndex
+        return
       }
-      if (lastIndex < part.length) {
-        result.push(part.substring(lastIndex))
-      }
-      return result.length > 0 ? result : part
-    })
 
-    // Parse Italic: *text*
-    parts = parts.flatMap((part) => {
-      if (typeof part !== 'string') return part
-      const regex = /\*(.*?)\*/g
-      const result = []
-      let lastIndex = 0
-      let match
-      while ((match = regex.exec(part)) !== null) {
-        if (match.index > lastIndex) {
-          result.push(part.substring(lastIndex, match.index))
+      const oListMatch = line.match(/^(\d+)\.\s+(.*)/)
+      if (oListMatch) {
+        const itemContent = oListMatch[2]
+        if (!currentList || currentList.type !== 'ol') {
+          flushList(idx)
+          currentList = { type: 'ol', items: [itemContent] }
+        } else {
+          currentList.items.push(itemContent)
         }
-        result.push(<em key={match.index} className="italic text-workspace-text/90">{match[1]}</em>)
-        lastIndex = regex.lastIndex
+        return
       }
-      if (lastIndex < part.length) {
-        result.push(part.substring(lastIndex))
-      }
-      return result.length > 0 ? result : part
-    })
 
-    // Parse Strikethrough: ~~text~~
-    parts = parts.flatMap((part) => {
-      if (typeof part !== 'string') return part
-      const regex = /~~(.*?)~~/g
-      const result = []
-      let lastIndex = 0
-      let match
-      while ((match = regex.exec(part)) !== null) {
-        if (match.index > lastIndex) {
-          result.push(part.substring(lastIndex, match.index))
-        }
-        result.push(<span key={match.index} className="line-through text-workspace-text-secondary/80">{match[1]}</span>)
-        lastIndex = regex.lastIndex
-      }
-      if (lastIndex < part.length) {
-        result.push(part.substring(lastIndex))
-      }
-      return result.length > 0 ? result : part
-    })
+      flushList(idx)
 
-    // Parse Inline Code: `code`
-    parts = parts.flatMap((part) => {
-      if (typeof part !== 'string') return part
-      const regex = /`(.*?)`/g
-      const result = []
-      let lastIndex = 0
-      let match
-      while ((match = regex.exec(part)) !== null) {
-        if (match.index > lastIndex) {
-          result.push(part.substring(lastIndex, match.index))
-        }
-        result.push(<code key={match.index} className="bg-workspace-border/60 text-workspace-primary px-1.5 py-0.5 rounded text-xs font-mono">{match[1]}</code>)
-        lastIndex = regex.lastIndex
+      if (line.startsWith('# ')) {
+        blocks.push(<h1 key={idx} className="font-brand text-2xl font-bold text-workspace-text mt-5 mb-2 border-b border-workspace-border/60 pb-1.5">{parseInlineStyles(line.slice(2))}</h1>)
+        return
       }
-      if (lastIndex < part.length) {
-        result.push(part.substring(lastIndex))
+      if (line.startsWith('## ')) {
+        blocks.push(<h2 key={idx} className="font-brand text-xl font-bold text-workspace-text mt-4 mb-2">{parseInlineStyles(line.slice(3))}</h2>)
+        return
       }
-      return result.length > 0 ? result : part
-    })
+      if (line.startsWith('### ')) {
+        blocks.push(<h3 key={idx} className="font-brand text-lg font-bold text-workspace-text mt-3 mb-1.5">{parseInlineStyles(line.slice(4))}</h3>)
+        return
+      }
 
-    // Parse Links: [text](url)
-    parts = parts.flatMap((part) => {
-      if (typeof part !== 'string') return part
-      const regex = /\[(.*?)\]\((.*?)\)/g
-      const result = []
-      let lastIndex = 0
-      let match
-      while ((match = regex.exec(part)) !== null) {
-        if (match.index > lastIndex) {
-          result.push(part.substring(lastIndex, match.index))
-        }
-        result.push(
-          <a 
-            key={match.index} 
-            href={match[2]} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="text-workspace-primary hover:underline font-medium"
-          >
-            {match[1]}
-          </a>
+      if (trimmed === '---' || trimmed === '***' || trimmed === '___') {
+        blocks.push(<hr key={idx} className="border-workspace-border my-4" />)
+        return
+      }
+
+      if (line.startsWith('> ')) {
+        blocks.push(
+          <blockquote key={idx} className="border-l-4 border-workspace-primary pl-4 py-1.5 my-2.5 bg-workspace-card/40 rounded-r-xl italic text-workspace-text-secondary text-sm">
+            {parseInlineStyles(line.slice(2))}
+          </blockquote>
         )
-        lastIndex = regex.lastIndex
+        return
       }
-      if (lastIndex < part.length) {
-        result.push(part.substring(lastIndex))
+
+      if (trimmed === '') {
+        blocks.push(<div key={idx} className="h-2" />)
+        return
       }
-      return result.length > 0 ? result : part
+
+      blocks.push(<p key={idx} className="text-sm text-workspace-text leading-relaxed my-1">{parseInlineStyles(line)}</p>)
     })
 
-    return parts
+    flushList('final')
+    return blocks
   }
 
   // Filter notes based on search query
@@ -785,9 +853,9 @@ export default function NotepadView() {
                 </div>
 
                 {/* Standard formatting */}
-                <button onClick={() => insertFormatting('**', '**')} className="p-2 hover:bg-workspace-border/60 text-workspace-text rounded-lg transition-all" title="Bold"><Bold size={15} /></button>
-                <button onClick={() => insertFormatting('*', '*')} className="p-2 hover:bg-workspace-border/60 text-workspace-text rounded-lg transition-all" title="Italic"><Italic size={15} /></button>
-                <button onClick={() => insertFormatting('~~', '~~')} className="p-2 hover:bg-workspace-border/60 text-workspace-text rounded-lg transition-all" title="Strikethrough"><StrikethroughIcon size={15} /></button>
+                <button onClick={() => insertInlineFormatting('**', '**', 'bold text')} className="p-2 hover:bg-workspace-border/60 text-workspace-text rounded-lg transition-all" title="Bold"><Bold size={15} /></button>
+                <button onClick={() => insertInlineFormatting('*', '*', 'italic text')} className="p-2 hover:bg-workspace-border/60 text-workspace-text rounded-lg transition-all" title="Italic"><Italic size={15} /></button>
+                <button onClick={() => insertInlineFormatting('~~', '~~', 'strikethrough text')} className="p-2 hover:bg-workspace-border/60 text-workspace-text rounded-lg transition-all" title="Strikethrough"><StrikethroughIcon size={15} /></button>
                 <button onClick={insertLink} className="p-2 hover:bg-workspace-border/60 text-workspace-text rounded-lg transition-all" title="Insert Link"><LinkIcon size={15} /></button>
               </div>
 
@@ -826,7 +894,7 @@ export default function NotepadView() {
                 onChange={(e) => handleTitleChange(e.target.value)}
                 placeholder="Untitled Note"
                 disabled={activeNote?.isExternal} // Prevent title rename on disk for external files
-                className="w-full bg-transparent text-xl font-bold text-workspace-text border-b border-transparent focus:border-workspace-border outline-none pb-1.5 transition-all disabled:opacity-75 disabled:hover:border-transparent"
+                className="w-full bg-transparent text-xl font-bold text-workspace-text border-b border-transparent focus:border-workspace-border outline-none pb-1.5 transition-all disabled:opacity-75 disabled:hover:border-transparent font-brand"
               />
 
               {viewMode === 'write' ? (
@@ -834,6 +902,7 @@ export default function NotepadView() {
                   ref={textareaRef}
                   value={editorContent}
                   onChange={(e) => handleContentChange(e.target.value)}
+                  onKeyDown={handleKeyDown}
                   placeholder="Start writing plain text or markdown..."
                   className="flex-1 w-full bg-transparent text-sm text-workspace-text leading-relaxed outline-none resize-none placeholder-workspace-text-secondary/50 font-normal overflow-y-auto"
                 />
