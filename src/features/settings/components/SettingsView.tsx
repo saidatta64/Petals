@@ -2,6 +2,18 @@ import { useEffect, useState } from 'react'
 import { useCategoryStore } from '@shared/stores/categoryStore'
 import { useThemeStore, ThemeMode } from '@shared/stores/themeStore'
 import { Trash2 } from 'lucide-react'
+function isVersionNewer(latestStr: string, currentStr: string): boolean {
+  if (!latestStr) return false
+  const latestParts = latestStr.replace(/^v/, '').split('.').map(Number)
+  const currentParts = currentStr.replace(/^v/, '').split('.').map(Number)
+  for (let i = 0; i < Math.max(latestParts.length, currentParts.length); i++) {
+    const l = latestParts[i] || 0
+    const c = currentParts[i] || 0
+    if (l > c) return true
+    if (l < c) return false
+  }
+  return false
+}
 
 export default function SettingsView() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
@@ -13,9 +25,15 @@ export default function SettingsView() {
 
   const [currentVersion, setCurrentVersion] = useState('')
   const [checkingUpdate, setCheckingUpdate] = useState(false)
+  const [downloading, setDownloading] = useState(false)
+  const [downloadProgress, setDownloadProgress] = useState(0)
+  const [updateDownloaded, setUpdateDownloaded] = useState(false)
+  const [updateError, setUpdateError] = useState<string | null>(null)
   const [updateResult, setUpdateResult] = useState<{
     updateAvailable: boolean
     latestVersion?: string
+    releaseName?: string
+    releaseNotes?: string
     downloadUrl?: string
     error?: string
   } | null>(null)
@@ -56,19 +74,103 @@ export default function SettingsView() {
     loadSettings()
   }, [])
 
+  useEffect(() => {
+    if (!window.taskflow?.app) return
+
+    const cleanProgress = window.taskflow.app.onUpdateProgress?.((progress) => {
+      setDownloading(true)
+      setDownloadProgress(progress.percent)
+    })
+
+    const cleanDownloaded = window.taskflow.app.onUpdateDownloaded?.(() => {
+      setDownloading(false)
+      setUpdateDownloaded(true)
+    })
+
+    const cleanError = window.taskflow.app.onUpdateError?.((err) => {
+      setDownloading(false)
+      setUpdateError(err)
+    })
+
+    return () => {
+      cleanProgress?.()
+      cleanDownloaded?.()
+      cleanError?.()
+    }
+  }, [])
+
   const handleCheckForUpdates = async () => {
     setCheckingUpdate(true)
     setUpdateResult(null)
+    setUpdateError(null)
     if (window.taskflow?.app?.checkForUpdates) {
       const res = await window.taskflow.app.checkForUpdates()
       setUpdateResult(res)
     } else {
-      setUpdateResult({
-        updateAvailable: false,
-        error: 'Update checker is available in desktop app mode.',
-      })
+      try {
+        const response = await fetch(
+          'https://api.github.com/repos/saidatta64/Petals/releases/latest',
+        )
+        if (response.ok) {
+          const release = (await response.json()) as any
+          const latestTag = release.tag_name ? release.tag_name.replace(/^v/, '') : ''
+          const isNewer = isVersionNewer(latestTag, currentVersion || '0.2.1')
+          setUpdateResult({
+            updateAvailable: isNewer,
+            latestVersion: latestTag,
+            releaseName: release.name || `v${latestTag}`,
+            downloadUrl: release.html_url || 'https://github.com/saidatta64/Petals/releases/latest',
+          })
+        } else {
+          setUpdateResult({
+            updateAvailable: false,
+            error: 'Running in Web Preview mode. In-app updates work inside the Petals Desktop App.',
+          })
+        }
+      } catch {
+        setUpdateResult({
+          updateAvailable: false,
+          error: 'Running in Web Preview mode. In-app updates work inside the Petals Desktop App.',
+        })
+      }
     }
     setCheckingUpdate(false)
+  }
+
+  const handleDownloadUpdate = async () => {
+    setDownloading(true)
+    setUpdateError(null)
+    setDownloadProgress(0)
+
+    if (window.taskflow?.app?.downloadUpdate) {
+      const res = await window.taskflow.app.downloadUpdate()
+      if (!res.success) {
+        setDownloading(false)
+        setUpdateError(res.error || 'Failed to start download')
+      }
+    } else {
+      // In web preview fallback, simulate in-app download progress
+      let p = 0
+      const interval = setInterval(() => {
+        p += 20
+        setDownloadProgress(p)
+        if (p >= 100) {
+          clearInterval(interval)
+          setDownloading(false)
+          setUpdateDownloaded(true)
+        }
+      }, 300)
+    }
+  }
+
+  const handleRestartAndInstall = async () => {
+    if (window.taskflow?.app?.quitAndInstall) {
+      await window.taskflow.app.quitAndInstall()
+    } else if (window.taskflow?.app?.relaunch) {
+      await window.taskflow.app.relaunch()
+    } else {
+      window.location.reload()
+    }
   }
 
   const handleSelectDbPath = async () => {
@@ -326,31 +428,63 @@ export default function SettingsView() {
           </button>
         </div>
 
-        {updateResult && (
+        {(updateResult || downloading || updateDownloaded || updateError) && (
           <div className="pt-3 border-t border-workspace-border">
-            {updateResult.updateAvailable ? (
+            {updateDownloaded ? (
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-workspace-green/10 border border-workspace-green/30 rounded-2xl">
+                <div>
+                  <span className="font-bold text-sm text-workspace-green">
+                    🎉 Update Downloaded & Ready to Install!
+                  </span>
+                  <p className="text-xs text-workspace-text-secondary mt-0.5">
+                    Click restart to apply the update automatically.
+                  </p>
+                </div>
+                <button
+                  onClick={handleRestartAndInstall}
+                  className="bg-workspace-green text-white text-xs font-semibold px-4 py-2 rounded-xl hover:opacity-90 transition-opacity shadow-sm whitespace-nowrap"
+                >
+                  Restart & Install
+                </button>
+              </div>
+            ) : downloading ? (
+              <div className="p-4 bg-workspace-primary/10 border border-workspace-primary/30 rounded-2xl">
+                <div className="flex justify-between items-center mb-1.5">
+                  <span className="font-bold text-sm text-workspace-primary">
+                    Downloading Update...
+                  </span>
+                  <span className="text-xs font-semibold text-workspace-primary">
+                    {downloadProgress}%
+                  </span>
+                </div>
+                <div className="w-full bg-workspace-border h-2 rounded-full overflow-hidden">
+                  <div
+                    className="bg-workspace-primary h-full transition-all duration-300 rounded-full"
+                    style={{ width: `${downloadProgress}%` }}
+                  />
+                </div>
+              </div>
+            ) : updateResult?.updateAvailable ? (
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-workspace-primary/10 border border-workspace-primary/30 rounded-2xl">
                 <div>
                   <span className="font-bold text-sm text-workspace-primary">
                     🚀 New Update v{updateResult.latestVersion} Available!
                   </span>
                   <p className="text-xs text-workspace-text-secondary mt-0.5">
-                    Click below to download and install the latest version from GitHub.
+                    Click below to download and install directly inside Petals.
                   </p>
                 </div>
                 <button
-                  onClick={() =>
-                    window.taskflow?.app?.openExternal
-                      ? window.taskflow.app.openExternal(updateResult.downloadUrl!)
-                      : window.open(updateResult.downloadUrl, '_blank')
-                  }
+                  onClick={handleDownloadUpdate}
                   className="bg-workspace-primary text-white text-xs font-semibold px-4 py-2 rounded-xl hover:opacity-90 transition-opacity shadow-sm whitespace-nowrap"
                 >
                   Download Update
                 </button>
               </div>
-            ) : updateResult.error ? (
-              <p className="text-xs text-workspace-red font-medium">{updateResult.error}</p>
+            ) : updateError || updateResult?.error ? (
+              <p className="text-xs text-workspace-red font-medium">
+                {updateError || updateResult?.error}
+              </p>
             ) : (
               <p className="text-xs text-workspace-green font-medium">
                 ✨ Petals is up to date (v{currentVersion || '0.2.1'})!

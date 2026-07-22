@@ -19,7 +19,7 @@ export default function TaskList({
   if (tasks.length === 0) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-light-text-secondary dark:text-dark-text-secondary">{emptyMessage}</p>
+        <p className="text-workspace-text-secondary">{emptyMessage}</p>
       </div>
     )
   }

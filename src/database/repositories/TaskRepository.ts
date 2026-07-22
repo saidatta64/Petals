@@ -129,6 +129,7 @@ export class TaskRepository {
   }
 
   static delete(id: number) {
+    getDatabase().delete(schema.reminders).where(eq(schema.reminders.taskId, id)).run()
     return getDatabase().delete(schema.tasks).where(eq(schema.tasks.id, id)).run()
   }
 

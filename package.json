@@ -47,6 +47,7 @@
     "autoprefixer": "^10.4.16",
     "better-sqlite3": "^11.10.0",
     "drizzle-orm": "^0.29.1",
+    "electron-updater": "^6.8.9",
     "framer-motion": "^12.42.2",
     "lucide-react": "^0.294.0",
     "postcss": "^8.4.32",
@@ -81,6 +82,11 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "saidatta64",
+      "repo": "Petals"
     }
   }
 }

@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain, Notification, dialog, shell } from 'electron'
+import { autoUpdater } from 'electron-updater'
 import path from 'path'
 import fs from 'fs'
 
@@ -86,6 +87,32 @@ function isVersionNewer(latestStr: string, currentStr: string): boolean {
   return false
 }
 
+autoUpdater.autoDownload = false
+autoUpdater.autoInstallOnAppQuit = true
+
+autoUpdater.on('download-progress', (progressObj) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('app:updateProgress', {
+      bytesPerSecond: progressObj.bytesPerSecond,
+      percent: Math.round(progressObj.percent),
+      transferred: progressObj.transferred,
+      total: progressObj.total,
+    })
+  }
+})
+
+autoUpdater.on('update-downloaded', (info) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('app:updateDownloaded', info)
+  }
+})
+
+autoUpdater.on('error', (err) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('app:updateError', err?.message || 'Update failed')
+  }
+})
+
 ipcMain.handle('app:version', () => app.getVersion())
 ipcMain.handle('app:name', () => app.getName())
 ipcMain.handle('app:relaunch', () => {
@@ -116,6 +143,12 @@ ipcMain.handle('app:checkForUpdates', async () => {
     const currentVersion = app.getVersion()
     const isNewer = isVersionNewer(latestTag, currentVersion)
 
+    if (isNewer && app.isPackaged) {
+      autoUpdater.checkForUpdates().catch((err) => {
+        console.error('autoUpdater check failed:', err)
+      })
+    }
+
     return {
       updateAvailable: isNewer,
       currentVersion,
@@ -131,6 +164,61 @@ ipcMain.handle('app:checkForUpdates', async () => {
       currentVersion: app.getVersion(),
       error: err.message || 'Network error',
     }
+  }
+})
+
+ipcMain.handle('app:downloadUpdate', async () => {
+  try {
+    if (app.isPackaged) {
+      await autoUpdater.downloadUpdate()
+      return { success: true }
+    } else {
+      // In dev mode, stream in-app download progress to test UI without leaving the app
+      let percent = 0
+      const interval = setInterval(() => {
+        percent += 20
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send('app:updateProgress', {
+            bytesPerSecond: 1024 * 1024 * 5,
+            percent,
+            transferred: (percent / 100) * 45000000,
+            total: 45000000,
+          })
+        }
+        if (percent >= 100) {
+          clearInterval(interval)
+          if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send('app:updateDownloaded', { version: 'latest' })
+          }
+        }
+      }, 300)
+      return { success: true }
+    }
+  } catch (err: any) {
+    console.error('Failed to start update download:', err)
+    return { success: false, error: err.message || 'Failed to download update' }
+  }
+})
+
+ipcMain.handle('app:quitAndInstall', () => {
+  console.log('Executing quitAndInstall...')
+  try {
+    if (app.isPackaged) {
+      setImmediate(() => {
+        app.removeAllListeners('window-all-closed')
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.destroy()
+        }
+        autoUpdater.quitAndInstall(false, true)
+      })
+    } else {
+      app.relaunch()
+      app.exit(0)
+    }
+  } catch (err) {
+    console.error('Error in quitAndInstall, performing emergency exit:', err)
+    app.relaunch()
+    app.exit(0)
   }
 })
 

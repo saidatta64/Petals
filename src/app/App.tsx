@@ -11,6 +11,8 @@ import StatisticsView from '@features/statistics/components/StatisticsView'
 import SettingsView from '@features/settings/components/SettingsView'
 import NotepadView from '@features/notepad/components/NotepadView'
 import VisualsView from '@features/visuals/components/VisualsView'
+import { UpdateModal } from '@shared/components/UpdateModal'
+import { UpdateToast } from '@shared/components/UpdateToast'
 
 type ViewType =
   'dashboard' | 'all' | 'upcoming' | 'completed' | 'statistics' | 'settings' | 'notepad' | 'visuals'
@@ -18,6 +20,7 @@ type ViewType =
 function App() {
   const [currentView, setCurrentView] = useState<ViewType>('dashboard')
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false)
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false)
 
   const isDarkMode = useThemeStore((state) => state.isDarkMode)
   const toggleTheme = useThemeStore((state) => state.toggleTheme)
@@ -96,6 +99,8 @@ function App() {
         {renderView()}
       </WorkspaceLayout>
       <TaskDialog isOpen={isTaskDialogOpen} onClose={() => setIsTaskDialogOpen(false)} />
+      <UpdateToast onOpenModal={() => setIsUpdateModalOpen(true)} />
+      <UpdateModal forceOpen={isUpdateModalOpen} onClose={() => setIsUpdateModalOpen(false)} />
     </div>
   )
 }

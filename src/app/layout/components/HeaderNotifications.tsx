@@ -169,14 +169,15 @@ export const HeaderNotifications: React.FC = () => {
                       {item.description}
                     </p>
                     <button
-                      onClick={() =>
-                        window.taskflow?.app?.openExternal
-                          ? window.taskflow.app.openExternal(item.downloadUrl!)
-                          : window.open(item.downloadUrl, '_blank')
-                      }
+                      onClick={() => {
+                        setShowNotifications(false)
+                        window.dispatchEvent(
+                          new CustomEvent('petals:open-update-modal', { detail: updateInfo }),
+                        )
+                      }}
                       className="mt-1 w-full text-xs font-semibold py-1.5 rounded-xl bg-workspace-primary text-white hover:opacity-90 transition-opacity shadow-sm flex items-center justify-center gap-1.5"
                     >
-                      Download Update
+                      View & Install Update
                     </button>
                   </div>
                 ) : (

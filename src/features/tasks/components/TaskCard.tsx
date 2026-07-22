@@ -15,19 +15,19 @@ export default function TaskCard({
   onDelete,
   showCheckbox = true,
 }: TaskCardProps) {
-  const categories = useCategoryStore((state) => state.getCategories())
+  const categories = useCategoryStore((state) => state.categories)
   const category = categories.find((c) => c.id === task.categoryId)
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'HIGH':
-        return 'text-light-danger dark:text-dark-danger'
+        return 'text-workspace-red font-bold'
       case 'MEDIUM':
-        return 'text-light-warning dark:text-dark-warning'
+        return 'text-workspace-amber font-semibold'
       case 'LOW':
-        return 'text-light-primary dark:text-dark-primary'
+        return 'text-workspace-primary font-medium'
       default:
-        return 'text-light-text-secondary dark:text-dark-text-secondary'
+        return 'text-workspace-text-secondary'
     }
   }
 
@@ -38,17 +38,20 @@ export default function TaskCard({
 
   return (
     <div
-      className={`bg-light-surface dark:bg-dark-surface rounded-card p-4 border border-light-border dark:border-dark-border flex items-center gap-4 hover:shadow-md transition-shadow ${
+      className={`bg-workspace-card/90 backdrop-blur-xl border border-workspace-border/60 rounded-xl p-4 flex items-center gap-4 hover:shadow-sm hover:border-workspace-border transition-all ${
         task.status === 'COMPLETED' ? 'opacity-50' : ''
       }`}
     >
-      {/* Checkbox / Checkpoint */}
+      {/* Checkbox */}
       {showCheckbox && (
         <input
           type="checkbox"
           checked={task.status === 'COMPLETED'}
-          onChange={() => onComplete?.(task.id)}
-          className="w-5 h-5 rounded cursor-pointer"
+          onChange={(e) => {
+            e.stopPropagation()
+            onComplete?.(task.id)
+          }}
+          className="w-5 h-5 rounded cursor-pointer accent-workspace-primary"
         />
       )}
 
@@ -57,25 +60,25 @@ export default function TaskCard({
         <h3
           className={`font-medium ${
             task.status === 'COMPLETED'
-              ? 'line-through text-light-text-secondary dark:text-dark-text-secondary'
-              : 'text-light-text dark:text-dark-text'
+              ? 'line-through text-workspace-text-secondary'
+              : 'text-workspace-text'
           }`}
         >
           {task.title}
         </h3>
         {task.description && (
-          <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-1">
+          <p className="text-xs text-workspace-text-secondary mt-1 leading-relaxed">
             {task.description}
           </p>
         )}
       </div>
 
       {/* Badges and Info */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         {/* Category Badge */}
         {category && (
           <span
-            className="px-2 py-1 rounded-full text-xs font-medium text-white"
+            className="px-2.5 py-0.5 rounded-full text-xs font-semibold text-white shadow-xs"
             style={{ backgroundColor: category.color }}
           >
             {category.name}
@@ -89,19 +92,26 @@ export default function TaskCard({
 
         {/* Due Date */}
         {task.dueDate && (
-          <div className="flex items-center gap-1 text-sm text-light-text-secondary dark:text-dark-text-secondary">
+          <div className="flex items-center gap-1 text-xs text-workspace-text-secondary">
             <Clock size={14} />
             <span>{formatDate(task.dueDate)}</span>
           </div>
         )}
 
-        {/* Delete Button */}
-        <button
-          onClick={() => onDelete?.(task.id)}
-          className="p-1 hover:bg-light-bg dark:hover:bg-dark-bg rounded transition-colors text-light-text-secondary dark:text-dark-text-secondary hover:text-light-danger dark:hover:text-dark-danger"
-        >
-          <Trash2 size={16} />
-        </button>
+        {/* Delete Button (Only rendered if onDelete handler is explicitly provided) */}
+        {onDelete && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onDelete(task.id)
+            }}
+            className="p-1.5 hover:bg-workspace-red/10 rounded-lg transition-colors text-workspace-text-secondary hover:text-workspace-red focus:outline-none"
+            title="Delete task"
+          >
+            <Trash2 size={16} />
+          </button>
+        )}
       </div>
     </div>
   )

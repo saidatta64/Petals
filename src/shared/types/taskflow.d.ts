@@ -12,7 +12,14 @@ export interface TaskflowAPI {
       downloadUrl?: string
       error?: string
     }>
+    downloadUpdate: () => Promise<{ success: boolean; isDev?: boolean; error?: string }>
+    quitAndInstall: () => Promise<void>
     openExternal: (url: string) => Promise<void>
+    onUpdateProgress?: (
+      callback: (progress: { percent: number; bytesPerSecond: number; transferred: number; total: number }) => void,
+    ) => () => void
+    onUpdateDownloaded?: (callback: (info: any) => void) => () => void
+    onUpdateError?: (callback: (error: string) => void) => () => void
   }
   tasks: {
     create: (input: unknown) => Promise<unknown>

@@ -7,7 +7,24 @@ const api = {
     name: () => ipcRenderer.invoke('app:name'),
     relaunch: () => ipcRenderer.invoke('app:relaunch'),
     checkForUpdates: () => ipcRenderer.invoke('app:checkForUpdates'),
+    downloadUpdate: () => ipcRenderer.invoke('app:downloadUpdate'),
+    quitAndInstall: () => ipcRenderer.invoke('app:quitAndInstall'),
     openExternal: (url: string) => ipcRenderer.invoke('app:openExternal', url),
+    onUpdateProgress: (callback: (progress: { percent: number; bytesPerSecond: number; transferred: number; total: number }) => void) => {
+      const listener = (_event: unknown, progress: any) => callback(progress)
+      ipcRenderer.on('app:updateProgress', listener)
+      return () => ipcRenderer.removeListener('app:updateProgress', listener)
+    },
+    onUpdateDownloaded: (callback: (info: any) => void) => {
+      const listener = (_event: unknown, info: any) => callback(info)
+      ipcRenderer.on('app:updateDownloaded', listener)
+      return () => ipcRenderer.removeListener('app:updateDownloaded', listener)
+    },
+    onUpdateError: (callback: (error: string) => void) => {
+      const listener = (_event: unknown, error: string) => callback(error)
+      ipcRenderer.on('app:updateError', listener)
+      return () => ipcRenderer.removeListener('app:updateError', listener)
+    },
   },
   tasks: {
     create: (input: unknown) => ipcRenderer.invoke('task:create', input),
