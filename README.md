@@ -147,4 +147,4 @@ Internal engineering specifications and design notes are kept locally in the `do
 
 ## 📄 License
 
-This project is licensed under the [ISC License](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
