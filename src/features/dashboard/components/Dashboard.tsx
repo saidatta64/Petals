@@ -9,33 +9,40 @@ import { DashboardHero } from './DashboardHero'
 import { OnboardingModal } from './OnboardingModal'
 
 export default function Dashboard() {
-  useTaskStore((state) => state.tasks)
+  const tasks = useTaskStore((state) => state.tasks)
   const getTodayTasks = useTaskStore((state) => state.getTodayTasks)
   const getTasksByStatus = useTaskStore((state) => state.getTasksByStatus)
-  const todayTasks = getTodayTasks()
-  const completed = getTasksByStatus('COMPLETED')
+
+  const todayTasks = useMemo(() => getTodayTasks(), [tasks])
+  const completed = useMemo(() => getTasksByStatus('COMPLETED'), [tasks])
 
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false)
   const [taskToEdit, setTaskToEdit] = useState<any>(null)
-  const [username, setUsername] = useState<string | null>(null)
+  const [username, setUsername] = useState<string | null>('Friend')
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [nameInput, setNameInput] = useState('')
   const [dbPath, setDbPath] = useState('')
 
   useEffect(() => {
-    async function loadUsername() {
+    async function loadInitialData() {
       if (window.taskflow) {
-        const savedName = await window.taskflow.settings.get('username')
+        // Load both in parallel so neither blocks the other
+        const [savedName, currentDbPath] = await Promise.all([
+          window.taskflow.settings.get('username'),
+          window.taskflow.db.getPath(),
+        ])
+
+        // Set the db path first so the onboarding modal has it ready
+        if (currentDbPath) setDbPath(currentDbPath)
+
         if (savedName && typeof savedName === 'string') {
           setUsername(savedName)
         } else {
           setShowOnboarding(true)
         }
-        const currentDbPath = await window.taskflow.db.getPath()
-        setDbPath(currentDbPath)
       }
     }
-    loadUsername()
+    loadInitialData()
   }, [])
 
   const handleSelectDbPath = async () => {
@@ -61,14 +68,17 @@ export default function Dashboard() {
     }
   }
 
-  const todayStart = new Date()
-  todayStart.setHours(0, 0, 0, 0)
+  const pendingTasks = useMemo(
+    () => todayTasks.filter((t) => t.status === 'PENDING'),
+    [todayTasks]
+  )
+  const completedTodayTasks = useMemo(
+    () => todayTasks.filter((t) => t.status === 'COMPLETED'),
+    [todayTasks]
+  )
 
-  const todayCompleted = completed.filter(
-    (t) => t.completedAt && t.completedAt >= todayStart.getTime()
-  ).length
-
-  const pendingCount = todayTasks.length - todayCompleted
+  const pendingCount = pendingTasks.length
+  const todayCompleted = completedTodayTasks.length
 
   const currentStreak = useMemo(() => {
     const uniqueDays = new Set(
@@ -100,8 +110,6 @@ export default function Dashboard() {
     <div className="space-y-12">
       <DashboardHero
         username={username}
-        pendingCount={pendingCount}
-        totalTodayTasks={todayTasks.length}
         currentStreak={currentStreak}
         onNewTaskClick={() => {
           setTaskToEdit(null)
@@ -126,12 +134,17 @@ export default function Dashboard() {
               </span>
             </div>
             <div className="space-y-3">
-              {todayTasks.length === 0 || pendingCount === 0 ? (
+              {todayTasks.length === 0 ? (
                 <div className="bg-workspace-card/50 border border-workspace-border rounded-[16px] p-8 text-center text-workspace-text-secondary">
-                  {getEmptyFocusTasksMessage(todayTasks.length > 0)}
+                  {getEmptyFocusTasksMessage(false)}
                 </div>
               ) : (
                 <div className="space-y-3">
+                  {pendingCount === 0 && (
+                    <div className="bg-workspace-card/50 border border-workspace-border rounded-[16px] p-6 text-center text-workspace-text-secondary mb-3">
+                      {getEmptyFocusTasksMessage(true)}
+                    </div>
+                  )}
                   {todayTasks.map((task) => (
                     <FocusTaskCard
                       key={task.id}

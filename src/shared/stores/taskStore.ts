@@ -101,16 +101,34 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     const start = startOfDay(now)
     const end = endOfDay(now)
 
-    const todayTasks = get().tasks.filter(
-      (task) =>
-        ((task.dueDate && task.dueDate >= start && task.dueDate <= end) ||
-          (task.createdAt >= start && task.createdAt <= end)),
-    )
+    const todayTasks = get().tasks.filter((task) => {
+      // 1. If completed, it must have been completed TODAY
+      //    AND it must NOT have been originally due on a past day
+      if (task.status === 'COMPLETED') {
+        const completedToday = Boolean(
+          task.completedAt && task.completedAt >= start && task.completedAt <= end,
+        )
+        if (!completedToday) return false
+
+        // Exclude tasks that were due on a previous day (e.g. Jul 18, 19, 20)
+        if (task.dueDate && task.dueDate < start) return false
+
+        return true
+      }
+
+      // 2. If task has a due date, it MUST be due TODAY (not overdue from past)
+      if (task.dueDate) {
+        return task.dueDate >= start && task.dueDate <= end
+      }
+
+      // 3. If task has NO due date, it must have been created TODAY
+      return task.createdAt >= start && task.createdAt <= end
+    })
 
     return todayTasks.sort((a, b) => {
-      if (a.status === 'COMPLETED' && b.status !== 'COMPLETED') return 1;
-      if (a.status !== 'COMPLETED' && b.status === 'COMPLETED') return -1;
-      return 0;
+      if (a.status === 'COMPLETED' && b.status !== 'COMPLETED') return 1
+      if (a.status !== 'COMPLETED' && b.status === 'COMPLETED') return -1
+      return (b.createdAt || 0) - (a.createdAt || 0)
     })
   },
 
@@ -172,41 +190,82 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   },
 
   createTask: async (input) => {
-    if (!window.taskflow) return
-    const task = (await window.taskflow.tasks.create(input)) as Task
-    get().addTask(task)
+    if (!window.taskflow) {
+      const mockTask: Task = {
+        id: Date.now(),
+        ...input,
+        status: 'PENDING',
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      }
+      get().addTask(mockTask)
+      return
+    }
+    try {
+      const task = (await window.taskflow.tasks.create(input)) as Task
+      if (task) {
+        get().addTask(task)
+      }
+    } catch (err) {
+      console.error('Failed to create task in DB:', err)
+    }
   },
 
   editTask: async (id, updates) => {
-    if (!window.taskflow) return
-    const updated = (await window.taskflow.tasks.update(id, updates)) as Task
-    get().updateTask(id, updated)
+    get().updateTask(id, updates)
+    if (window.taskflow) {
+      try {
+        const updated = (await window.taskflow.tasks.update(id, updates)) as Task
+        if (updated) {
+          get().updateTask(id, updated)
+        }
+      } catch (err) {
+        console.error('Failed to edit task in DB:', err)
+      }
+    }
   },
 
   removeTask: async (id) => {
-    if (!window.taskflow) return
-    await window.taskflow.tasks.delete(id)
     get().deleteTask(id)
+    if (window.taskflow) {
+      try {
+        await window.taskflow.tasks.delete(id)
+      } catch (err) {
+        console.error('Failed to delete task from DB:', err)
+      }
+    }
   },
 
   toggleComplete: async (id) => {
-    if (!window.taskflow) return
     const task = get().tasks.find((t) => t.id === id)
     if (!task) return
 
     if (task.status === 'COMPLETED') {
-      const updated = (await window.taskflow.tasks.update(id, {
-        status: 'PENDING',
-        completedAt: undefined,
-      })) as Task
-      get().updateTask(id, updated)
-    } else {
-      const updated = (await window.taskflow.tasks.complete(id)) as Task
-      get().updateTask(id, updated)
+      get().updateTask(id, { status: 'PENDING', completedAt: null })
       if (window.taskflow) {
-        window.taskflow.notifications.show('Task Completed! 🎉', {
-          body: `"${updated.title}" has been marked as done.`,
-        })
+        try {
+          await window.taskflow.tasks.update(id, {
+            status: 'PENDING',
+            completedAt: undefined,
+          })
+        } catch (err) {
+          console.error('Failed to update task status in DB:', err)
+        }
+      }
+    } else {
+      const now = Date.now()
+      get().updateTask(id, { status: 'COMPLETED', completedAt: now })
+      if (window.taskflow) {
+        try {
+          const updated = (await window.taskflow.tasks.complete(id)) as Task
+          if (updated) {
+            window.taskflow.notifications.show('Task Completed! 🎉', {
+              body: `"${updated.title || task.title}" has been marked as done.`,
+            })
+          }
+        } catch (err) {
+          console.error('Failed to complete task in DB:', err)
+        }
       }
     }
   },

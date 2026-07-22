@@ -14,7 +14,7 @@ import VisualsView from '@features/visuals/components/VisualsView'
 
 type ViewType =
   | 'dashboard'
-  | 'today'
+  | 'all'
   | 'upcoming'
   | 'completed'
   | 'statistics'
@@ -32,7 +32,6 @@ function App() {
 
   const loadTasks = useTaskStore((state) => state.loadTasks)
   const loadCategories = useCategoryStore((state) => state.loadCategories)
-  const getTodayTasks = useTaskStore((state) => state.getTodayTasks)
   const getTasksByStatus = useTaskStore((state) => state.getTasksByStatus)
 
   useEffect(() => {
@@ -45,7 +44,11 @@ function App() {
       if (window.taskflow) {
         const view = await window.taskflow.settings.get('default_view')
         if (view) {
-          setCurrentView(view as ViewType)
+          if (view === 'today') {
+            setCurrentView('all')
+          } else {
+            setCurrentView(view as ViewType)
+          }
         }
       }
     }
@@ -60,13 +63,13 @@ function App() {
         return <NotepadView />
       case 'visuals':
         return <VisualsView />
-      case 'today':
+      case 'all':
         return (
           <TasksView
-            title="Today's Tasks"
-            subtitle="Focus on what matters today."
-            tasks={getTodayTasks()}
-            emptyMessage="No tasks for today. Add one to get started!"
+            title="All Tasks"
+            subtitle="Overview of all your active pending tasks."
+            tasks={getTasksByStatus('PENDING')}
+            emptyMessage="No pending tasks found. Click + New Task to get started!"
             showCheckbox={false}
           />
         )

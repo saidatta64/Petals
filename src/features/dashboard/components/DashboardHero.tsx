@@ -5,21 +5,17 @@ import { getGreetingTitle, getGreetingSubtext } from '@shared/utils/greetingUtil
 
 interface DashboardHeroProps {
   username: string | null;
-  pendingCount: number;
-  totalTodayTasks: number;
   currentStreak: number;
   onNewTaskClick: () => void;
 }
 
 export const DashboardHero: React.FC<DashboardHeroProps> = ({
   username,
-  pendingCount,
-  totalTodayTasks,
   currentStreak,
   onNewTaskClick,
 }) => {
   const { title, emoji } = getGreetingTitle(username);
-  const subtext = getGreetingSubtext(pendingCount, totalTodayTasks, currentStreak);
+  const subtext = getGreetingSubtext();
 
   return (
     <section className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">

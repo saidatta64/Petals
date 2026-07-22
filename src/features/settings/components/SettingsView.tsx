@@ -136,7 +136,7 @@ export default function SettingsView() {
             className="bg-workspace-bg text-workspace-text border border-workspace-border rounded-xl px-4 py-2 text-sm outline-none cursor-pointer focus:ring-2 focus:ring-workspace-primary/50 transition-shadow"
           >
             <option value="dashboard">Dashboard</option>
-            <option value="today">Today&apos;s Tasks</option>
+            <option value="all">All Tasks</option>
             <option value="upcoming">Upcoming Tasks</option>
           </select>
         </div>

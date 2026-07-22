@@ -22,44 +22,19 @@ export function getGreetingTitle(username: string | null): { title: string; emoj
   }
 }
 
-export function getGreetingSubtext(
-  pendingCount: number,
-  totalTodayTasks: number,
-  currentStreak: number
-): string {
+export function getGreetingSubtext(): string {
   const timeOfDay = getTimeOfDay();
 
-  if (totalTodayTasks === 0) {
-    switch (timeOfDay) {
-      case 'morning':
-        return 'Your schedule is clear for today. Plan ahead or take it easy!';
-      case 'afternoon':
-        return 'No tasks scheduled for today. Enjoy your afternoon!';
-      case 'evening':
-        return 'No tasks scheduled today. Relax and enjoy your evening.';
-      case 'night':
-        return 'No tasks on your list. Get some rest and recharge for tomorrow!';
-    }
+  switch (timeOfDay) {
+    case 'morning':
+      return 'Hope you have a productive and focus-filled morning!';
+    case 'afternoon':
+      return "Hope you're having a great and productive afternoon!";
+    case 'evening':
+      return 'Hope you had a wonderful day. Time to review and relax!';
+    case 'night':
+      return 'Time to unwind, get some rest, and recharge for tomorrow.';
   }
-
-  if (pendingCount === 0) {
-    switch (timeOfDay) {
-      case 'morning':
-      case 'afternoon':
-        return 'All tasks completed for today! Great job staying ahead.';
-      case 'evening':
-        return 'All tasks completed for today! Relax and enjoy your evening.';
-      case 'night':
-        return 'All tasks completed for today! Time to unwind and rest.';
-    }
-  }
-
-  const streakText =
-    currentStreak > 0
-      ? ` Complete ${pendingCount === 1 ? 'it' : 'them'} to keep your ${currentStreak}-day streak alive 🔥`
-      : ' Let’s make steady progress today!';
-
-  return `You have ${pendingCount} pending task${pendingCount > 1 ? 's' : ''} today.${streakText}`;
 }
 
 export function getEmptyFocusTasksMessage(hasAnyTasksToday: boolean): string {

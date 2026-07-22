@@ -6,7 +6,7 @@ import {
   CheckCircle2,
   BarChart3,
   Settings,
-  Zap,
+  ListTodo,
   FileText,
   Palette,
 } from 'lucide-react';
@@ -15,7 +15,7 @@ import { SidebarNav, NavItem } from './components/SidebarNav';
 
 const navItems: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: Home },
-  { id: 'today', label: 'Today', icon: Zap },
+  { id: 'all', label: 'All Tasks', icon: ListTodo },
   { id: 'upcoming', label: 'Upcoming', icon: CalendarIcon },
   { id: 'notepad', label: 'Notepad', icon: FileText },
   { id: 'visuals', label: 'Visuals', icon: Palette },
