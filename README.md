@@ -140,7 +140,8 @@ Ensure you have the following installed on your machine:
 
 ## 📚 Documentation
 
-Internal engineering specifications and design notes are kept locally in the `docs/` directory (excluded from repository tracking via `.gitignore`).
+Detailed engineering specifications and architecture documentation formatted for GitHub Wiki are located in the [`wiki/`](file:///e:/resume/petals/wiki/) directory. Internal notes and PRD documents are located in `docs/`.
+
 
 
 ---

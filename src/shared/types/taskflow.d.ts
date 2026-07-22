@@ -3,6 +3,16 @@ export interface TaskflowAPI {
     version: () => Promise<string>
     name: () => Promise<string>
     relaunch: () => Promise<void>
+    checkForUpdates: () => Promise<{
+      updateAvailable: boolean
+      currentVersion: string
+      latestVersion?: string
+      releaseName?: string
+      releaseNotes?: string
+      downloadUrl?: string
+      error?: string
+    }>
+    openExternal: (url: string) => Promise<void>
   }
   tasks: {
     create: (input: unknown) => Promise<unknown>

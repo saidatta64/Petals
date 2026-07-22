@@ -11,6 +11,15 @@ export default function SettingsView() {
   const [isSaved, setIsSaved] = useState(false)
   const [newCategoryName, setNewCategoryName] = useState('')
 
+  const [currentVersion, setCurrentVersion] = useState('')
+  const [checkingUpdate, setCheckingUpdate] = useState(false)
+  const [updateResult, setUpdateResult] = useState<{
+    updateAvailable: boolean
+    latestVersion?: string
+    downloadUrl?: string
+    error?: string
+  } | null>(null)
+
   const categories = useCategoryStore((state) => state.categories)
   const createCategory = useCategoryStore((state) => state.createCategory)
   const deleteCategory = useCategoryStore((state) => state.deleteCategory)
@@ -25,6 +34,10 @@ export default function SettingsView() {
         const view = await window.taskflow.settings.get('default_view')
         const name = await window.taskflow.settings.get('username')
         const path = await window.taskflow.db.getPath()
+        if (window.taskflow.app?.version) {
+          const ver = await window.taskflow.app.version()
+          setCurrentVersion(ver)
+        }
 
         if (notif !== undefined) {
           setNotificationsEnabled(notif === 'true' || notif === true)
@@ -42,6 +55,21 @@ export default function SettingsView() {
     }
     loadSettings()
   }, [])
+
+  const handleCheckForUpdates = async () => {
+    setCheckingUpdate(true)
+    setUpdateResult(null)
+    if (window.taskflow?.app?.checkForUpdates) {
+      const res = await window.taskflow.app.checkForUpdates()
+      setUpdateResult(res)
+    } else {
+      setUpdateResult({
+        updateAvailable: false,
+        error: 'Update checker is available in desktop app mode.',
+      })
+    }
+    setCheckingUpdate(false)
+  }
 
   const handleSelectDbPath = async () => {
     if (window.taskflow) {
@@ -275,6 +303,61 @@ export default function SettingsView() {
             Add
           </button>
         </form>
+      </div>
+
+      {/* App Updates Section */}
+      <div className="bg-workspace-card backdrop-blur-md border border-workspace-border rounded-[24px] p-6 space-y-4 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold text-workspace-text text-lg">App Updates & Version</h3>
+            <p className="text-sm text-workspace-text-secondary mt-0.5">
+              Current Version:{' '}
+              <span className="font-mono font-bold text-workspace-text">
+                v{currentVersion || '0.2.1'}
+              </span>
+            </p>
+          </div>
+          <button
+            onClick={handleCheckForUpdates}
+            disabled={checkingUpdate}
+            className="bg-workspace-primary text-white font-semibold rounded-xl px-5 py-2.5 hover:opacity-90 transition-opacity text-sm shadow-md disabled:opacity-50"
+          >
+            {checkingUpdate ? 'Checking...' : 'Check for Updates'}
+          </button>
+        </div>
+
+        {updateResult && (
+          <div className="pt-3 border-t border-workspace-border">
+            {updateResult.updateAvailable ? (
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-workspace-primary/10 border border-workspace-primary/30 rounded-2xl">
+                <div>
+                  <span className="font-bold text-sm text-workspace-primary">
+                    🚀 New Update v{updateResult.latestVersion} Available!
+                  </span>
+                  <p className="text-xs text-workspace-text-secondary mt-0.5">
+                    Click below to download and install the latest version from GitHub.
+                  </p>
+                </div>
+                <button
+                  onClick={() =>
+                    window.taskflow?.app?.openExternal
+                      ? window.taskflow.app.openExternal(updateResult.downloadUrl!)
+                      : window.open(updateResult.downloadUrl, '_blank')
+                  }
+                  className="bg-workspace-primary text-white text-xs font-semibold px-4 py-2 rounded-xl hover:opacity-90 transition-opacity shadow-sm whitespace-nowrap"
+                >
+                  Download Update
+                </button>
+              </div>
+            ) : updateResult.error ? (
+              <p className="text-xs text-workspace-red font-medium">{updateResult.error}</p>
+            ) : (
+              <p className="text-xs text-workspace-green font-medium">
+                ✨ Petals is up to date (v{currentVersion || '0.2.1'})!
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

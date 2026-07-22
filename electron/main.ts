@@ -73,11 +73,71 @@ app.on('activate', () => {
   }
 })
 
+function isVersionNewer(latestStr: string, currentStr: string): boolean {
+  if (!latestStr) return false
+  const latestParts = latestStr.replace(/^v/, '').split('.').map(Number)
+  const currentParts = currentStr.replace(/^v/, '').split('.').map(Number)
+  for (let i = 0; i < Math.max(latestParts.length, currentParts.length); i++) {
+    const l = latestParts[i] || 0
+    const c = currentParts[i] || 0
+    if (l > c) return true
+    if (l < c) return false
+  }
+  return false
+}
+
 ipcMain.handle('app:version', () => app.getVersion())
 ipcMain.handle('app:name', () => app.getName())
 ipcMain.handle('app:relaunch', () => {
   app.relaunch()
   app.exit()
+})
+
+ipcMain.handle('app:checkForUpdates', async () => {
+  try {
+    const response = await fetch(
+      'https://api.github.com/repos/saidatta64/Petals/releases/latest',
+      {
+        headers: {
+          'User-Agent': 'Petals-App',
+          Accept: 'application/vnd.github.v3+json',
+        },
+      },
+    )
+    if (!response.ok) {
+      return {
+        updateAvailable: false,
+        currentVersion: app.getVersion(),
+        error: 'Could not connect to GitHub release server',
+      }
+    }
+    const release = (await response.json()) as any
+    const latestTag = release.tag_name ? release.tag_name.replace(/^v/, '') : ''
+    const currentVersion = app.getVersion()
+    const isNewer = isVersionNewer(latestTag, currentVersion)
+
+    return {
+      updateAvailable: isNewer,
+      currentVersion,
+      latestVersion: latestTag,
+      releaseName: release.name || `v${latestTag}`,
+      releaseNotes: release.body || '',
+      downloadUrl: release.html_url || 'https://github.com/saidatta64/Petals/releases/latest',
+    }
+  } catch (err: any) {
+    console.error('Failed to check for updates:', err)
+    return {
+      updateAvailable: false,
+      currentVersion: app.getVersion(),
+      error: err.message || 'Network error',
+    }
+  }
+})
+
+ipcMain.handle('app:openExternal', (_event, url: string) => {
+  if (url && (url.startsWith('https://') || url.startsWith('http://'))) {
+    shell.openExternal(url)
+  }
 })
 
 ipcMain.handle('task:create', (_event, input) => TaskRepository.create(input))

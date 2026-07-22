@@ -6,6 +6,8 @@ const api = {
     version: () => ipcRenderer.invoke('app:version'),
     name: () => ipcRenderer.invoke('app:name'),
     relaunch: () => ipcRenderer.invoke('app:relaunch'),
+    checkForUpdates: () => ipcRenderer.invoke('app:checkForUpdates'),
+    openExternal: (url: string) => ipcRenderer.invoke('app:openExternal', url),
   },
   tasks: {
     create: (input: unknown) => ipcRenderer.invoke('task:create', input),
