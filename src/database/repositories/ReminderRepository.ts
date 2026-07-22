@@ -26,15 +26,19 @@ export class ReminderRepository {
   }
 
   static getById(id: number) {
-    return getDatabase().query.reminders.findFirst({
-      where: eq(schema.reminders.id, id),
-    }).sync()
+    return getDatabase()
+      .query.reminders.findFirst({
+        where: eq(schema.reminders.id, id),
+      })
+      .sync()
   }
 
   static getByTaskId(taskId: number) {
-    return getDatabase().query.reminders.findFirst({
-      where: eq(schema.reminders.taskId, taskId),
-    }).sync()
+    return getDatabase()
+      .query.reminders.findFirst({
+        where: eq(schema.reminders.taskId, taskId),
+      })
+      .sync()
   }
 
   static getAll() {
@@ -42,9 +46,11 @@ export class ReminderRepository {
   }
 
   static getEnabled() {
-    return getDatabase().query.reminders.findMany({
-      where: eq(schema.reminders.enabled, true),
-    }).sync()
+    return getDatabase()
+      .query.reminders.findMany({
+        where: eq(schema.reminders.enabled, true),
+      })
+      .sync()
   }
 
   static update(id: number, input: Partial<CreateReminderInput>) {

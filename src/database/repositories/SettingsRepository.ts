@@ -15,8 +15,7 @@ export class SettingsRepository {
   static get(key: string) {
     const db = getRawDatabase()
     const result = db.prepare('SELECT value FROM settings WHERE key = ?').get(key) as
-      | { value: string }
-      | undefined
+      { value: string } | undefined
 
     if (!result) return null
 

@@ -24,8 +24,12 @@ export const tasks = sqliteTable(
     categoryId: integer('category_id')
       .notNull()
       .references(() => categories.id),
-    priority: text('priority', { enum: ['HIGH', 'MEDIUM', 'LOW'] }).notNull().default('MEDIUM'),
-    status: text('status', { enum: ['PENDING', 'COMPLETED'] }).notNull().default('PENDING'),
+    priority: text('priority', { enum: ['HIGH', 'MEDIUM', 'LOW'] })
+      .notNull()
+      .default('MEDIUM'),
+    status: text('status', { enum: ['PENDING', 'COMPLETED'] })
+      .notNull()
+      .default('PENDING'),
     dueDate: integer('due_date'), // Unix timestamp
     recurringType: text('recurring_type', {
       enum: ['NONE', 'DAILY', 'WEEKLY', 'MONTHLY', 'CUSTOM'],
@@ -55,7 +59,9 @@ export const reminders = sqliteTable(
     reminderTime: integer('reminder_time').notNull(), // Unix timestamp
     repeatType: text('repeat_type', {
       enum: ['NONE', 'DAILY', 'WEEKLY', 'MONTHLY', 'CUSTOM'],
-    }).notNull().default('NONE'),
+    })
+      .notNull()
+      .default('NONE'),
     customInterval: integer('custom_interval'), // For custom repeat intervals
     enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
   },

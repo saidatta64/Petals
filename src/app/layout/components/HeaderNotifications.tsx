@@ -1,50 +1,50 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Bell } from 'lucide-react';
-import { useTaskStore, Task } from '../../../shared/stores/taskStore';
+import React, { useState, useEffect, useRef, useMemo } from 'react'
+import { Bell } from 'lucide-react'
+import { useTaskStore, Task } from '../../../shared/stores/taskStore'
 
 export const HeaderNotifications: React.FC = () => {
-  const tasks = useTaskStore((state) => state.tasks);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const notificationsRef = useRef<HTMLDivElement>(null);
+  const tasks = useTaskStore((state) => state.tasks)
+  const [showNotifications, setShowNotifications] = useState(false)
+  const notificationsRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (notificationsRef.current && !notificationsRef.current.contains(e.target as Node)) {
-        setShowNotifications(false);
+        setShowNotifications(false)
       }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const todayTasks = useMemo(() => {
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-    const end = new Date();
-    end.setHours(23, 59, 59, 999);
+    const start = new Date()
+    start.setHours(0, 0, 0, 0)
+    const end = new Date()
+    end.setHours(23, 59, 59, 999)
     return tasks.filter(
-      (t: Task) => t.dueDate && t.dueDate >= start.getTime() && t.dueDate <= end.getTime()
-    );
-  }, [tasks]);
+      (t: Task) => t.dueDate && t.dueDate >= start.getTime() && t.dueDate <= end.getTime(),
+    )
+  }, [tasks])
 
   const completedToday = useMemo(() => {
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-    const end = new Date();
-    end.setHours(23, 59, 59, 999);
+    const start = new Date()
+    start.setHours(0, 0, 0, 0)
+    const end = new Date()
+    end.setHours(23, 59, 59, 999)
     return tasks.filter(
       (t: Task) =>
         t.status === 'COMPLETED' &&
         t.completedAt &&
         t.completedAt >= start.getTime() &&
-        t.completedAt <= end.getTime()
-    );
-  }, [tasks]);
+        t.completedAt <= end.getTime(),
+    )
+  }, [tasks])
 
   const notificationsList = useMemo(() => {
-    const list: { id: string; title: string; description: string; time: string }[] = [];
+    const list: { id: string; title: string; description: string; time: string }[] = []
 
-    const pendingDueToday = todayTasks.filter((t: Task) => t.status === 'PENDING');
+    const pendingDueToday = todayTasks.filter((t: Task) => t.status === 'PENDING')
     if (pendingDueToday.length > 0) {
       list.push({
         id: 'due-today',
@@ -53,7 +53,7 @@ export const HeaderNotifications: React.FC = () => {
           pendingDueToday.length > 1 ? 's' : ''
         } to complete today.`,
         time: 'Today',
-      });
+      })
     }
 
     completedToday.forEach((task: Task) => {
@@ -67,8 +67,8 @@ export const HeaderNotifications: React.FC = () => {
               minute: '2-digit',
             })
           : 'Today',
-      });
-    });
+      })
+    })
 
     if (list.length === 0) {
       list.push({
@@ -76,15 +76,15 @@ export const HeaderNotifications: React.FC = () => {
         title: 'All caught up!',
         description: 'No new notifications.',
         time: 'Now',
-      });
+      })
     }
 
-    return list;
-  }, [todayTasks, completedToday]);
+    return list
+  }, [todayTasks, completedToday])
 
   const hasActiveNotifications = useMemo(() => {
-    return notificationsList.length > 0 && notificationsList[0].id !== 'empty';
-  }, [notificationsList]);
+    return notificationsList.length > 0 && notificationsList[0].id !== 'empty'
+  }, [notificationsList])
 
   return (
     <div className="relative" ref={notificationsRef}>
@@ -126,11 +126,11 @@ export const HeaderNotifications: React.FC = () => {
                     {item.description}
                   </p>
                 </div>
-              )
+              ),
             )}
           </div>
         </div>
       )}
     </div>
-  );
-};
+  )
+}

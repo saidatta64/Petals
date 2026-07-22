@@ -1,24 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { 
-  Plus, 
-  Search, 
-  Trash2, 
-  FileText, 
-  Check, 
-  Save, 
-  FolderOpen, 
-  Eye, 
-  Edit3, 
-  FileCode, 
-  Bold, 
-  Italic, 
+import {
+  Plus,
+  Search,
+  Trash2,
+  FileText,
+  Check,
+  Save,
+  FolderOpen,
+  Eye,
+  Edit3,
+  FileCode,
+  Bold,
+  Italic,
   Underline as StrikethroughIcon, // using as Strikethrough
-  Link as LinkIcon, 
+  Link as LinkIcon,
   Heading1,
   Heading2,
   Heading3,
   List,
-  ListOrdered
+  ListOrdered,
 } from 'lucide-react'
 
 interface NoteFile {
@@ -60,17 +60,17 @@ export default function NotepadView() {
 
     try {
       // 1. Fetch default notes from the system notes folder
-      const defaultNotesList = await window.taskflow.notes.list() as NoteFile[]
-      
+      const defaultNotesList = (await window.taskflow.notes.list()) as NoteFile[]
+
       // 2. Fetch external files paths saved in localStorage
       const savedExternalPaths = localStorage.getItem('petals_external_note_paths')
       let externalNotes: NoteFile[] = []
-      
+
       if (savedExternalPaths) {
         try {
           const paths = JSON.parse(savedExternalPaths) as string[]
           for (const filePath of paths) {
-            const content = await window.taskflow.notes.readExternal(filePath) as string
+            const content = (await window.taskflow.notes.readExternal(filePath)) as string
             if (content !== undefined) {
               const filename = filePath.split(/[\\/]/).pop() || 'External File'
               externalNotes.push({
@@ -78,7 +78,7 @@ export default function NotepadView() {
                 path: filePath,
                 updatedAt: Date.now(),
                 isExternal: true,
-                content
+                content,
               })
             }
           }
@@ -87,7 +87,9 @@ export default function NotepadView() {
         }
       }
 
-      const allNotes = [...externalNotes, ...defaultNotesList].sort((a, b) => b.updatedAt - a.updatedAt)
+      const allNotes = [...externalNotes, ...defaultNotesList].sort(
+        (a, b) => b.updatedAt - a.updatedAt,
+      )
       setNotes(allNotes)
 
       if (allNotes.length > 0) {
@@ -95,10 +97,11 @@ export default function NotepadView() {
       } else {
         // Create a default welcome note if the directory is empty
         const defaultFilename = 'Welcome to Petals.txt'
-        const defaultContent = '# Welcome to Petals 🌸\n\nThis is your plain text notebook. Everything you write here is saved as a real `.txt` file on your computer.\n\n### Key Features:\n1. **Plain Text Files**: All notes are written as plain `.txt` files in your user data directory.\n2. **Open External Files**: You can click "Open External File" to read and edit any text file on your computer.\n3. **Markdown Helper Toolbar**: Use the toolbar above to quickly format headers, bold/italic text, links, and tables.\n4. **System Editor Sync**: Click "Open in system notepad" to view or edit the note using your default desktop program.\n5. **Autosave**: Your changes are saved automatically on keystroke.\n\nHave fun writing! ✨'
+        const defaultContent =
+          '# Welcome to Petals 🌸\n\nThis is your plain text notebook. Everything you write here is saved as a real `.txt` file on your computer.\n\n### Key Features:\n1. **Plain Text Files**: All notes are written as plain `.txt` files in your user data directory.\n2. **Open External Files**: You can click "Open External File" to read and edit any text file on your computer.\n3. **Markdown Helper Toolbar**: Use the toolbar above to quickly format headers, bold/italic text, links, and tables.\n4. **System Editor Sync**: Click "Open in system notepad" to view or edit the note using your default desktop program.\n5. **Autosave**: Your changes are saved automatically on keystroke.\n\nHave fun writing! ✨'
         await window.taskflow.notes.write(defaultFilename, defaultContent)
-        
-        const refreshed = await window.taskflow.notes.list() as NoteFile[]
+
+        const refreshed = (await window.taskflow.notes.list()) as NoteFile[]
         setNotes(refreshed)
         if (refreshed.length > 0) {
           selectNote(refreshed[0])
@@ -123,20 +126,22 @@ export default function NotepadView() {
   // Handle note content changes
   const handleContentChange = (content: string) => {
     setEditorContent(content)
-    setNotes(prev => prev.map(n => {
-      if (n.path === activeNotePath) {
-        return { ...n, content }
-      }
-      return n
-    }))
+    setNotes((prev) =>
+      prev.map((n) => {
+        if (n.path === activeNotePath) {
+          return { ...n, content }
+        }
+        return n
+      }),
+    )
     triggerAutosave(editorTitle, content)
   }
 
   // Handle note title changes
   const handleTitleChange = async (title: string) => {
     setEditorTitle(title)
-    
-    const activeNote = notes.find(n => n.path === activeNotePath)
+
+    const activeNote = notes.find((n) => n.path === activeNotePath)
     if (!activeNote) return
 
     // If it's an external file, we don't rename the file on disk easily to avoid path breaking,
@@ -154,7 +159,7 @@ export default function NotepadView() {
       if (!window.taskflow || !activeNotePath) return
       setSaveStatus('saving')
 
-      const activeNote = notes.find(n => n.path === activeNotePath)
+      const activeNote = notes.find((n) => n.path === activeNotePath)
       if (!activeNote) return
 
       if (activeNote.isExternal) {
@@ -165,7 +170,7 @@ export default function NotepadView() {
         // If title changed, rename file
         let targetFilename = activeNote.filename
         const newFilename = `${title.trim() || 'Untitled Note'}.txt`
-        
+
         if (newFilename !== activeNote.filename) {
           // Delete old file and write to new file name
           await window.taskflow.notes.delete(activeNote.filename)
@@ -175,21 +180,23 @@ export default function NotepadView() {
         const result = await window.taskflow.notes.write(targetFilename, content)
         if (result.success && newFilename !== activeNote.filename) {
           // Update note model
-          setNotes(prev => prev.map(n => {
-            if (n.path === activeNotePath) {
-              return {
-                ...n,
-                filename: targetFilename,
-                path: result.path,
-                updatedAt: Date.now()
+          setNotes((prev) =>
+            prev.map((n) => {
+              if (n.path === activeNotePath) {
+                return {
+                  ...n,
+                  filename: targetFilename,
+                  path: result.path,
+                  updatedAt: Date.now(),
+                }
               }
-            }
-            return n
-          }))
+              return n
+            }),
+          )
           setActiveNotePath(result.path)
         }
       }
-      
+
       setSaveStatus('saved')
       setTimeout(() => setSaveStatus('idle'), 2500)
     }, 2000) // 2 second natural pause delay
@@ -197,26 +204,28 @@ export default function NotepadView() {
 
   const handleCreateNote = async () => {
     if (!window.taskflow) return
-    
+
     // Find unique name
     const defaultTitle = 'Untitled Note'
     let count = 0
     let filename = `${defaultTitle}.txt`
-    
-    while (notes.some(n => n.filename === filename)) {
+
+    while (notes.some((n) => n.filename === filename)) {
       count++
       filename = `${defaultTitle} ${count}.txt`
     }
 
     await window.taskflow.notes.write(filename, '')
-    const defaultNotesList = await window.taskflow.notes.list() as NoteFile[]
-    
+    const defaultNotesList = (await window.taskflow.notes.list()) as NoteFile[]
+
     // Merge external notes back
-    const externalNotes = notes.filter(n => n.isExternal)
-    const allNotes = [...externalNotes, ...defaultNotesList].sort((a, b) => b.updatedAt - a.updatedAt)
+    const externalNotes = notes.filter((n) => n.isExternal)
+    const allNotes = [...externalNotes, ...defaultNotesList].sort(
+      (a, b) => b.updatedAt - a.updatedAt,
+    )
     setNotes(allNotes)
 
-    const newlyCreated = allNotes.find(n => n.filename === filename)
+    const newlyCreated = allNotes.find((n) => n.filename === filename)
     if (newlyCreated) {
       selectNote(newlyCreated)
       setViewMode('write')
@@ -229,8 +238,8 @@ export default function NotepadView() {
     if (!result) return
 
     // Check if it's already in the notes list
-    if (notes.some(n => n.path === result.path)) {
-      const existing = notes.find(n => n.path === result.path)
+    if (notes.some((n) => n.path === result.path)) {
+      const existing = notes.find((n) => n.path === result.path)
       if (existing) selectNote(existing)
       return
     }
@@ -240,7 +249,7 @@ export default function NotepadView() {
       path: result.path,
       updatedAt: result.updatedAt,
       isExternal: true,
-      content: result.content
+      content: result.content,
     }
 
     // Save external path to localStorage to persist it across restarts
@@ -273,7 +282,7 @@ export default function NotepadView() {
       if (savedExternalPaths) {
         try {
           const paths = JSON.parse(savedExternalPaths) as string[]
-          const filtered = paths.filter(p => p !== note.path)
+          const filtered = paths.filter((p) => p !== note.path)
           localStorage.setItem('petals_external_note_paths', JSON.stringify(filtered))
         } catch {}
       }
@@ -282,7 +291,7 @@ export default function NotepadView() {
       await window.taskflow.notes.delete(note.filename)
     }
 
-    const updated = notes.filter(n => n.path !== note.path)
+    const updated = notes.filter((n) => n.path !== note.path)
     setNotes(updated)
 
     if (activeNotePath === note.path) {
@@ -349,7 +358,11 @@ export default function NotepadView() {
     }, 10)
   }
 
-  const insertInlineFormatting = (prefix: string, suffix: string, defaultPlaceholder: string = 'text') => {
+  const insertInlineFormatting = (
+    prefix: string,
+    suffix: string,
+    defaultPlaceholder: string = 'text',
+  ) => {
     if (viewMode !== 'write') {
       setViewMode('write')
     }
@@ -366,7 +379,11 @@ export default function NotepadView() {
     let selectEnd = 0
 
     if (selected) {
-      if (selected.startsWith(prefix) && selected.endsWith(suffix) && selected.length >= prefix.length + suffix.length) {
+      if (
+        selected.startsWith(prefix) &&
+        selected.endsWith(suffix) &&
+        selected.length >= prefix.length + suffix.length
+      ) {
         replacement = selected.substring(prefix.length, selected.length - suffix.length)
         selectStart = start
         selectEnd = start + replacement.length
@@ -495,18 +512,43 @@ export default function NotepadView() {
       const [, , boldText, italicText, strikeText, codeText, linkText, linkUrl] = match
 
       if (boldText !== undefined) {
-        elements.push(<strong key={`b-${match.index}`} className="font-bold text-workspace-text">{boldText}</strong>)
+        elements.push(
+          <strong key={`b-${match.index}`} className="font-bold text-workspace-text">
+            {boldText}
+          </strong>,
+        )
       } else if (italicText !== undefined) {
-        elements.push(<em key={`i-${match.index}`} className="italic text-workspace-text">{italicText}</em>)
+        elements.push(
+          <em key={`i-${match.index}`} className="italic text-workspace-text">
+            {italicText}
+          </em>,
+        )
       } else if (strikeText !== undefined) {
-        elements.push(<span key={`s-${match.index}`} className="line-through text-workspace-text-secondary/80">{strikeText}</span>)
+        elements.push(
+          <span key={`s-${match.index}`} className="line-through text-workspace-text-secondary/80">
+            {strikeText}
+          </span>,
+        )
       } else if (codeText !== undefined) {
-        elements.push(<code key={`c-${match.index}`} className="bg-workspace-border/60 text-workspace-primary px-1.5 py-0.5 rounded text-xs font-mono">{codeText}</code>)
+        elements.push(
+          <code
+            key={`c-${match.index}`}
+            className="bg-workspace-border/60 text-workspace-primary px-1.5 py-0.5 rounded text-xs font-mono"
+          >
+            {codeText}
+          </code>,
+        )
       } else if (linkText !== undefined) {
         elements.push(
-          <a key={`l-${match.index}`} href={linkUrl} target="_blank" rel="noopener noreferrer" className="text-workspace-primary underline font-medium hover:opacity-80">
+          <a
+            key={`l-${match.index}`}
+            href={linkUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-workspace-primary underline font-medium hover:opacity-80"
+          >
             {linkText}
-          </a>
+          </a>,
         )
       }
       lastIndex = regex.lastIndex
@@ -520,7 +562,8 @@ export default function NotepadView() {
   }
 
   const renderMarkdown = (markdownText: string) => {
-    if (!markdownText) return <p className="text-workspace-text-secondary italic">Start typing to see preview...</p>
+    if (!markdownText)
+      return <p className="text-workspace-text-secondary italic">Start typing to see preview...</p>
 
     const lines = markdownText.split('\n')
     const blocks: React.ReactNode[] = []
@@ -530,19 +573,25 @@ export default function NotepadView() {
       if (!currentList) return
       if (currentList.type === 'ul') {
         blocks.push(
-          <ul key={`ul-${key}`} className="list-disc list-inside ml-2 my-2 space-y-1 text-sm text-workspace-text">
+          <ul
+            key={`ul-${key}`}
+            className="list-disc list-inside ml-2 my-2 space-y-1 text-sm text-workspace-text"
+          >
             {currentList.items.map((item, i) => (
               <li key={i}>{parseInlineStyles(item)}</li>
             ))}
-          </ul>
+          </ul>,
         )
       } else {
         blocks.push(
-          <ol key={`ol-${key}`} className="list-decimal list-inside ml-2 my-2 space-y-1 text-sm text-workspace-text">
+          <ol
+            key={`ol-${key}`}
+            className="list-decimal list-inside ml-2 my-2 space-y-1 text-sm text-workspace-text"
+          >
             {currentList.items.map((item, i) => (
               <li key={i}>{parseInlineStyles(item)}</li>
             ))}
-          </ol>
+          </ol>,
         )
       }
       currentList = null
@@ -577,15 +626,30 @@ export default function NotepadView() {
       flushList(idx)
 
       if (line.startsWith('# ')) {
-        blocks.push(<h1 key={idx} className="font-brand text-2xl font-bold text-workspace-text mt-5 mb-2 border-b border-workspace-border/60 pb-1.5">{parseInlineStyles(line.slice(2))}</h1>)
+        blocks.push(
+          <h1
+            key={idx}
+            className="font-brand text-2xl font-bold text-workspace-text mt-5 mb-2 border-b border-workspace-border/60 pb-1.5"
+          >
+            {parseInlineStyles(line.slice(2))}
+          </h1>,
+        )
         return
       }
       if (line.startsWith('## ')) {
-        blocks.push(<h2 key={idx} className="font-brand text-xl font-bold text-workspace-text mt-4 mb-2">{parseInlineStyles(line.slice(3))}</h2>)
+        blocks.push(
+          <h2 key={idx} className="font-brand text-xl font-bold text-workspace-text mt-4 mb-2">
+            {parseInlineStyles(line.slice(3))}
+          </h2>,
+        )
         return
       }
       if (line.startsWith('### ')) {
-        blocks.push(<h3 key={idx} className="font-brand text-lg font-bold text-workspace-text mt-3 mb-1.5">{parseInlineStyles(line.slice(4))}</h3>)
+        blocks.push(
+          <h3 key={idx} className="font-brand text-lg font-bold text-workspace-text mt-3 mb-1.5">
+            {parseInlineStyles(line.slice(4))}
+          </h3>,
+        )
         return
       }
 
@@ -596,9 +660,12 @@ export default function NotepadView() {
 
       if (line.startsWith('> ')) {
         blocks.push(
-          <blockquote key={idx} className="border-l-4 border-workspace-primary pl-4 py-1.5 my-2.5 bg-workspace-card/40 rounded-r-xl italic text-workspace-text-secondary text-sm">
+          <blockquote
+            key={idx}
+            className="border-l-4 border-workspace-primary pl-4 py-1.5 my-2.5 bg-workspace-card/40 rounded-r-xl italic text-workspace-text-secondary text-sm"
+          >
             {parseInlineStyles(line.slice(2))}
-          </blockquote>
+          </blockquote>,
         )
         return
       }
@@ -608,7 +675,11 @@ export default function NotepadView() {
         return
       }
 
-      blocks.push(<p key={idx} className="text-sm text-workspace-text leading-relaxed my-1">{parseInlineStyles(line)}</p>)
+      blocks.push(
+        <p key={idx} className="text-sm text-workspace-text leading-relaxed my-1">
+          {parseInlineStyles(line)}
+        </p>,
+      )
     })
 
     flushList('final')
@@ -616,33 +687,31 @@ export default function NotepadView() {
   }
 
   // Filter notes based on search query
-  const filteredNotes = notes.filter(note => {
+  const filteredNotes = notes.filter((note) => {
     const query = searchQuery.toLowerCase()
     const contentToSearch = note.content || ''
-    
+
     // We search the filename and the pre-loaded content (if loaded)
     return (
-      note.filename.toLowerCase().includes(query) ||
-      contentToSearch.toLowerCase().includes(query)
+      note.filename.toLowerCase().includes(query) || contentToSearch.toLowerCase().includes(query)
     )
   })
 
   // Format date helper
   const formatDate = (timestamp: number) => {
     const date = new Date(timestamp)
-    return date.toLocaleDateString(undefined, { 
-      month: 'short', 
-      day: 'numeric', 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return date.toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     })
   }
 
-  const activeNote = notes.find(n => n.path === activeNotePath)
+  const activeNote = notes.find((n) => n.path === activeNotePath)
 
   return (
     <div className="flex h-full w-full overflow-hidden bg-workspace-card/5">
-      
       {/* Left Column: Notes List */}
       <div className="w-80 border-r border-workspace-border flex flex-col bg-workspace-card/40 backdrop-blur-2xl">
         {/* Header Actions */}
@@ -672,7 +741,10 @@ export default function NotepadView() {
 
           {/* Search bar */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-workspace-text-secondary" size={16} />
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-workspace-text-secondary"
+              size={16}
+            />
             <input
               type="text"
               placeholder="Search notes..."
@@ -705,35 +777,43 @@ export default function NotepadView() {
                   }`}
                 >
                   <div className="flex justify-between items-start w-full gap-2">
-                    <span className={`font-semibold truncate text-sm flex-1 ${isActive ? 'text-white' : 'text-workspace-text'}`}>
+                    <span
+                      className={`font-semibold truncate text-sm flex-1 ${isActive ? 'text-white' : 'text-workspace-text'}`}
+                    >
                       {note.filename.replace('.txt', '') || 'Untitled Note'}
                     </span>
-                    <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${
-                      isActive 
-                        ? 'bg-white/20 text-white' 
-                        : (note.isExternal ? 'bg-workspace-border text-workspace-primary' : 'bg-workspace-primary/10 text-workspace-primary')
-                    }`}>
+                    <span
+                      className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${
+                        isActive
+                          ? 'bg-white/20 text-white'
+                          : note.isExternal
+                            ? 'bg-workspace-border text-workspace-primary'
+                            : 'bg-workspace-primary/10 text-workspace-primary'
+                      }`}
+                    >
                       {typeLabel}
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center w-full mt-1.5">
-                    <span className={`text-[10px] ${isActive ? 'text-white/80' : 'text-workspace-text-secondary'}`}>
+                    <span
+                      className={`text-[10px] ${isActive ? 'text-white/80' : 'text-workspace-text-secondary'}`}
+                    >
                       {note.isExternal ? 'Path: .../' + note.filename : formatDate(note.updatedAt)}
                     </span>
                   </div>
-                  
+
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
                       handleDeleteNote(note)
                     }}
                     className={`absolute right-3 bottom-3 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all ${
-                      isActive 
-                        ? 'text-white/70 hover:text-white hover:bg-white/10' 
+                      isActive
+                        ? 'text-white/70 hover:text-white hover:bg-white/10'
                         : 'text-workspace-text-secondary hover:text-workspace-red hover:bg-workspace-red/10'
                     }`}
-                    title={note.isExternal ? "Close external file" : "Delete note from disk"}
+                    title={note.isExternal ? 'Close external file' : 'Delete note from disk'}
                   >
                     <Trash2 size={13} />
                   </button>
@@ -775,9 +855,7 @@ export default function NotepadView() {
                   </span>
                 )}
                 {saveStatus === 'idle' && (
-                  <span>
-                    {activeNote?.isExternal ? 'Editing external file' : 'Saved locally'}
-                  </span>
+                  <span>{activeNote?.isExternal ? 'Editing external file' : 'Saved locally'}</span>
                 )}
               </div>
 
@@ -819,11 +897,31 @@ export default function NotepadView() {
                   </button>
                   {showHeadingDropdown && (
                     <div className="absolute top-full left-0 mt-1 bg-workspace-card border border-workspace-border rounded-xl shadow-glass-card py-1.5 w-32 z-50 animate-in fade-in duration-100">
-                      <button onClick={() => handleHeadingSelection(1)} className="w-full text-left px-3 py-1.5 text-xs font-bold hover:bg-workspace-border text-workspace-text flex items-center gap-1"><Heading1 size={13} /> Heading 1</button>
-                      <button onClick={() => handleHeadingSelection(2)} className="w-full text-left px-3 py-1.5 text-xs font-bold hover:bg-workspace-border text-workspace-text flex items-center gap-1"><Heading2 size={13} /> Heading 2</button>
-                      <button onClick={() => handleHeadingSelection(3)} className="w-full text-left px-3 py-1.5 text-xs font-bold hover:bg-workspace-border text-workspace-text flex items-center gap-1"><Heading3 size={13} /> Heading 3</button>
+                      <button
+                        onClick={() => handleHeadingSelection(1)}
+                        className="w-full text-left px-3 py-1.5 text-xs font-bold hover:bg-workspace-border text-workspace-text flex items-center gap-1"
+                      >
+                        <Heading1 size={13} /> Heading 1
+                      </button>
+                      <button
+                        onClick={() => handleHeadingSelection(2)}
+                        className="w-full text-left px-3 py-1.5 text-xs font-bold hover:bg-workspace-border text-workspace-text flex items-center gap-1"
+                      >
+                        <Heading2 size={13} /> Heading 2
+                      </button>
+                      <button
+                        onClick={() => handleHeadingSelection(3)}
+                        className="w-full text-left px-3 py-1.5 text-xs font-bold hover:bg-workspace-border text-workspace-text flex items-center gap-1"
+                      >
+                        <Heading3 size={13} /> Heading 3
+                      </button>
                       <hr className="border-workspace-border my-1" />
-                      <button onClick={() => handleHeadingSelection(0)} className="w-full text-left px-3 py-1.5 text-xs hover:bg-workspace-border text-workspace-text">Paragraph</button>
+                      <button
+                        onClick={() => handleHeadingSelection(0)}
+                        className="w-full text-left px-3 py-1.5 text-xs hover:bg-workspace-border text-workspace-text"
+                      >
+                        Paragraph
+                      </button>
                     </div>
                   )}
                 </div>
@@ -846,17 +944,51 @@ export default function NotepadView() {
                   </button>
                   {showListDropdown && (
                     <div className="absolute top-full left-0 mt-1 bg-workspace-card border border-workspace-border rounded-xl shadow-glass-card py-1.5 w-36 z-50 animate-in fade-in duration-100">
-                      <button onClick={() => handleListSelection('bullet')} className="w-full text-left px-3 py-1.5 text-xs hover:bg-workspace-border text-workspace-text flex items-center gap-2"><List size={14} /> Bullet List</button>
-                      <button onClick={() => handleListSelection('number')} className="w-full text-left px-3 py-1.5 text-xs hover:bg-workspace-border text-workspace-text flex items-center gap-2"><ListOrdered size={14} /> Numbered List</button>
+                      <button
+                        onClick={() => handleListSelection('bullet')}
+                        className="w-full text-left px-3 py-1.5 text-xs hover:bg-workspace-border text-workspace-text flex items-center gap-2"
+                      >
+                        <List size={14} /> Bullet List
+                      </button>
+                      <button
+                        onClick={() => handleListSelection('number')}
+                        className="w-full text-left px-3 py-1.5 text-xs hover:bg-workspace-border text-workspace-text flex items-center gap-2"
+                      >
+                        <ListOrdered size={14} /> Numbered List
+                      </button>
                     </div>
                   )}
                 </div>
 
                 {/* Standard formatting */}
-                <button onClick={() => insertInlineFormatting('**', '**', 'bold text')} className="p-2 hover:bg-workspace-border/60 text-workspace-text rounded-lg transition-all" title="Bold"><Bold size={15} /></button>
-                <button onClick={() => insertInlineFormatting('*', '*', 'italic text')} className="p-2 hover:bg-workspace-border/60 text-workspace-text rounded-lg transition-all" title="Italic"><Italic size={15} /></button>
-                <button onClick={() => insertInlineFormatting('~~', '~~', 'strikethrough text')} className="p-2 hover:bg-workspace-border/60 text-workspace-text rounded-lg transition-all" title="Strikethrough"><StrikethroughIcon size={15} /></button>
-                <button onClick={insertLink} className="p-2 hover:bg-workspace-border/60 text-workspace-text rounded-lg transition-all" title="Insert Link"><LinkIcon size={15} /></button>
+                <button
+                  onClick={() => insertInlineFormatting('**', '**', 'bold text')}
+                  className="p-2 hover:bg-workspace-border/60 text-workspace-text rounded-lg transition-all"
+                  title="Bold"
+                >
+                  <Bold size={15} />
+                </button>
+                <button
+                  onClick={() => insertInlineFormatting('*', '*', 'italic text')}
+                  className="p-2 hover:bg-workspace-border/60 text-workspace-text rounded-lg transition-all"
+                  title="Italic"
+                >
+                  <Italic size={15} />
+                </button>
+                <button
+                  onClick={() => insertInlineFormatting('~~', '~~', 'strikethrough text')}
+                  className="p-2 hover:bg-workspace-border/60 text-workspace-text rounded-lg transition-all"
+                  title="Strikethrough"
+                >
+                  <StrikethroughIcon size={15} />
+                </button>
+                <button
+                  onClick={insertLink}
+                  className="p-2 hover:bg-workspace-border/60 text-workspace-text rounded-lg transition-all"
+                  title="Insert Link"
+                >
+                  <LinkIcon size={15} />
+                </button>
               </div>
 
               {/* Edit / Preview Tabs */}
@@ -918,7 +1050,9 @@ export default function NotepadView() {
             <FileText size={48} className="stroke-[1.25] text-workspace-border" />
             <div className="text-center">
               <p className="font-semibold text-workspace-text">No Note Selected</p>
-              <p className="text-xs mt-1">Select a note, open an external file, or create a new local note to begin.</p>
+              <p className="text-xs mt-1">
+                Select a note, open an external file, or create a new local note to begin.
+              </p>
             </div>
             <div className="flex items-center gap-2 mt-2">
               <button
@@ -939,7 +1073,6 @@ export default function NotepadView() {
           </div>
         )}
       </div>
-
     </div>
   )
 }

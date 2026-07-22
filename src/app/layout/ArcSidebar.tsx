@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Home,
   Calendar as CalendarIcon,
@@ -9,9 +9,9 @@ import {
   ListTodo,
   FileText,
   Palette,
-} from 'lucide-react';
-import { SidebarBrand } from './components/SidebarBrand';
-import { SidebarNav, NavItem } from './components/SidebarNav';
+} from 'lucide-react'
+import { SidebarBrand } from './components/SidebarBrand'
+import { SidebarNav, NavItem } from './components/SidebarNav'
 
 const navItems: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: Home },
@@ -21,15 +21,15 @@ const navItems: NavItem[] = [
   { id: 'visuals', label: 'Visuals', icon: Palette },
   { id: 'statistics', label: 'Statistics', icon: BarChart3 },
   { id: 'completed', label: 'Completed', icon: CheckCircle2 },
-];
+]
 
 interface ArcSidebarProps {
-  currentView: string;
-  onViewChange: (view: any) => void;
+  currentView: string
+  onViewChange: (view: any) => void
 }
 
 export const ArcSidebar: React.FC<ArcSidebarProps> = ({ currentView, onViewChange }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
   return (
     <motion.aside
@@ -85,5 +85,5 @@ export const ArcSidebar: React.FC<ArcSidebarProps> = ({ currentView, onViewChang
         </button>
       </div>
     </motion.aside>
-  );
-};
+  )
+}

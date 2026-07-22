@@ -1,8 +1,8 @@
-import React from 'react';
-import { Flame } from 'lucide-react';
+import React from 'react'
+import { Flame } from 'lucide-react'
 
 interface StreakWidgetProps {
-  currentStreak: number;
+  currentStreak: number
 }
 
 export const StreakWidget: React.FC<StreakWidgetProps> = ({ currentStreak }) => {
@@ -13,24 +13,28 @@ export const StreakWidget: React.FC<StreakWidgetProps> = ({ currentStreak }) => 
           <Flame className="text-workspace-warning" size={22} />
         </div>
         <div>
-          <p className="text-workspace-text-secondary text-xs font-semibold uppercase tracking-wider">Current Streak</p>
+          <p className="text-workspace-text-secondary text-xs font-semibold uppercase tracking-wider">
+            Current Streak
+          </p>
           <div className="flex items-baseline gap-1 mt-0.5">
-            <p className="font-brand text-2xl font-bold text-workspace-text tracking-tight">{currentStreak}</p>
+            <p className="font-brand text-2xl font-bold text-workspace-text tracking-tight">
+              {currentStreak}
+            </p>
             <p className="text-xs font-medium text-workspace-text-secondary">Days</p>
           </div>
         </div>
       </div>
-      
+
       {/* Mini Activity Chart */}
       <div className="flex items-end gap-1.5 h-8">
         {[4, 7, 5, 8, 3, 9, 6].map((val, i) => (
-          <div 
-            key={i} 
+          <div
+            key={i}
             className="w-1.5 bg-workspace-warning/40 rounded-full transition-all"
             style={{ height: `${(val / 10) * 100}%` }}
           />
         ))}
       </div>
     </div>
-  );
-};
+  )
+}

@@ -1,14 +1,14 @@
-import React from 'react';
+import React from 'react'
 
 export interface OverallStats {
-  totalTasks: number;
-  completedTasks: number;
-  pendingTasks: number;
-  completionRate: number;
+  totalTasks: number
+  completedTasks: number
+  pendingTasks: number
+  completionRate: number
 }
 
 interface OverallStatsCardsProps {
-  overall: OverallStats;
+  overall: OverallStats
 }
 
 export const OverallStatsCards: React.FC<OverallStatsCardsProps> = ({ overall }) => {
@@ -41,5 +41,5 @@ export const OverallStatsCards: React.FC<OverallStatsCardsProps> = ({ overall })
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

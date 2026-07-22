@@ -9,7 +9,12 @@ interface TaskCardProps {
   showCheckbox?: boolean
 }
 
-export default function TaskCard({ task, onComplete, onDelete, showCheckbox = true }: TaskCardProps) {
+export default function TaskCard({
+  task,
+  onComplete,
+  onDelete,
+  showCheckbox = true,
+}: TaskCardProps) {
   const categories = useCategoryStore((state) => state.getCategories())
   const category = categories.find((c) => c.id === task.categoryId)
 

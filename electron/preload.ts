@@ -52,11 +52,13 @@ const api = {
   notes: {
     list: () => ipcRenderer.invoke('notes:list'),
     read: (filename: string) => ipcRenderer.invoke('notes:read', filename),
-    write: (filename: string, content: string) => ipcRenderer.invoke('notes:write', filename, content),
+    write: (filename: string, content: string) =>
+      ipcRenderer.invoke('notes:write', filename, content),
     delete: (filename: string) => ipcRenderer.invoke('notes:delete', filename),
     openExternalDialog: () => ipcRenderer.invoke('notes:openExternalDialog'),
     readExternal: (filePath: string) => ipcRenderer.invoke('notes:readExternal', filePath),
-    writeExternal: (filePath: string, content: string) => ipcRenderer.invoke('notes:writeExternal', filePath, content),
+    writeExternal: (filePath: string, content: string) =>
+      ipcRenderer.invoke('notes:writeExternal', filePath, content),
     openInExplorer: (filePath?: string) => ipcRenderer.invoke('notes:openInExplorer', filePath),
   },
 }

@@ -1,17 +1,17 @@
-import React from 'react';
+import React from 'react'
 
 interface TooltipState {
-  text: string;
-  x: number;
-  y: number;
+  text: string
+  x: number
+  y: number
 }
 
 interface HeatmapTooltipProps {
-  tooltip: TooltipState | null;
+  tooltip: TooltipState | null
 }
 
 export const HeatmapTooltip: React.FC<HeatmapTooltipProps> = ({ tooltip }) => {
-  if (!tooltip) return null;
+  if (!tooltip) return null
 
   return (
     <div
@@ -26,5 +26,5 @@ export const HeatmapTooltip: React.FC<HeatmapTooltipProps> = ({ tooltip }) => {
         <div className="w-2 h-2 bg-[#1b1f23] border-r border-b border-[#30363d] transform rotate-45 -mt-1" />
       </div>
     </div>
-  );
-};
+  )
+}

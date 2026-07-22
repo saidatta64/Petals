@@ -1,10 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from 'react'
 import { useTaskStore } from '@shared/stores/taskStore'
-import {
-  HeatmapData,
-  calculateHeatmapStats,
-  buildHeatmapColumns,
-} from '../utils/heatmapUtils'
+import { HeatmapData, calculateHeatmapStats, buildHeatmapColumns } from '../utils/heatmapUtils'
 import { HeatmapHeader } from './HeatmapHeader'
 import { HeatmapTooltip } from './HeatmapTooltip'
 import { HeatmapGrid } from './HeatmapGrid'
@@ -52,7 +48,7 @@ export default function Heatmap({ days = 365 }: HeatmapProps) {
         y: rect.top - containerRect.top - 8,
       })
     },
-    []
+    [],
   )
 
   return (

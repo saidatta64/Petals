@@ -23,15 +23,19 @@ export class CategoryRepository {
   }
 
   static getById(id: number) {
-    return getDatabase().query.categories.findFirst({
-      where: eq(schema.categories.id, id),
-    }).sync()
+    return getDatabase()
+      .query.categories.findFirst({
+        where: eq(schema.categories.id, id),
+      })
+      .sync()
   }
 
   static getByName(name: string) {
-    return getDatabase().query.categories.findFirst({
-      where: eq(schema.categories.name, name),
-    }).sync()
+    return getDatabase()
+      .query.categories.findFirst({
+        where: eq(schema.categories.name, name),
+      })
+      .sync()
   }
 
   static getAll() {

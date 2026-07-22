@@ -1,17 +1,17 @@
-import React from 'react';
-import { HeatmapCell, MonthLabel, getLevelColor } from '../utils/heatmapUtils';
+import React from 'react'
+import { HeatmapCell, MonthLabel, getLevelColor } from '../utils/heatmapUtils'
 
 interface HeatmapGridProps {
-  columns: HeatmapCell[][];
-  monthLabels: MonthLabel[];
-  onCellHover: (e: React.MouseEvent, cell: { date: string; count: number }) => void;
-  onCellLeave: () => void;
+  columns: HeatmapCell[][]
+  monthLabels: MonthLabel[]
+  onCellHover: (e: React.MouseEvent, cell: { date: string; count: number }) => void
+  onCellLeave: () => void
 }
 
-const CELL_SIZE = 11;
-const GAP = 3;
-const COL_WIDTH = CELL_SIZE + GAP;
-const dayLabels = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
+const CELL_SIZE = 11
+const GAP = 3
+const COL_WIDTH = CELL_SIZE + GAP
+const dayLabels = ['', 'Mon', '', 'Wed', '', 'Fri', '']
 
 export const HeatmapGrid: React.FC<HeatmapGridProps> = ({
   columns,
@@ -63,20 +63,20 @@ export const HeatmapGrid: React.FC<HeatmapGridProps> = ({
                           key={`empty-${colIdx}-${rowIdx}`}
                           style={{ width: CELL_SIZE, height: CELL_SIZE }}
                         />
-                      );
+                      )
                     }
 
                     return (
                       <div
                         key={cell.date}
                         className={`rounded-[2px] cursor-pointer transition-transform duration-100 hover:scale-125 hover:z-10 ${getLevelColor(
-                          cell.level
+                          cell.level,
                         )}`}
                         style={{ width: CELL_SIZE, height: CELL_SIZE }}
                         onMouseEnter={(e) => onCellHover(e, cell)}
                         onMouseLeave={onCellLeave}
                       />
-                    );
+                    )
                   })}
                 </div>
               ))}
@@ -96,5 +96,5 @@ export const HeatmapGrid: React.FC<HeatmapGridProps> = ({
         <span>More</span>
       </div>
     </>
-  );
-};
+  )
+}

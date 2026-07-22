@@ -29,7 +29,9 @@ export default function TasksView({
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <p className="text-light-text-secondary dark:text-dark-text-secondary">Loading tasks...</p>
+          <p className="text-light-text-secondary dark:text-dark-text-secondary">
+            Loading tasks...
+          </p>
         </div>
       ) : (
         <TaskList

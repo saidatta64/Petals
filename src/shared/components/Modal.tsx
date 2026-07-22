@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 
 interface ModalProps {
@@ -9,13 +10,7 @@ interface ModalProps {
   maxWidth?: 'sm' | 'md' | 'lg'
 }
 
-export default function Modal({
-  isOpen,
-  onClose,
-  title,
-  children,
-  maxWidth = 'md',
-}: ModalProps) {
+export default function Modal({ isOpen, onClose, title, children, maxWidth = 'md' }: ModalProps) {
   if (!isOpen) return null
 
   const maxWidthClasses = {
@@ -24,8 +19,8 @@ export default function Modal({
     lg: 'max-w-lg',
   }
 
-  return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  return createPortal(
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
       <div
         className={`bg-workspace-card border border-workspace-border rounded-[24px] p-6 shadow-glass-card ${maxWidthClasses[maxWidth]} w-full`}
       >
@@ -43,6 +38,7 @@ export default function Modal({
         {/* Content */}
         <div>{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

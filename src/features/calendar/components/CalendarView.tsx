@@ -41,7 +41,8 @@ export default function CalendarView() {
     const dayTasks = tasks.filter((t) => {
       const matchDue = t.dueDate && t.dueDate >= start.getTime() && t.dueDate <= end.getTime()
       const matchCreated = t.createdAt >= start.getTime() && t.createdAt <= end.getTime()
-      const matchCompleted = t.completedAt && t.completedAt >= start.getTime() && t.completedAt <= end.getTime()
+      const matchCompleted =
+        t.completedAt && t.completedAt >= start.getTime() && t.completedAt <= end.getTime()
       return matchDue || matchCreated || matchCompleted
     })
 
@@ -65,8 +66,18 @@ export default function CalendarView() {
   const yearOptions = Array.from({ length: 8 }, (_, i) => currentYear - 5 + i)
 
   const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ]
 
   return (
@@ -106,7 +117,9 @@ export default function CalendarView() {
                 className="bg-workspace-bg border border-workspace-border text-workspace-text rounded-xl px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-workspace-primary/50 cursor-pointer"
               >
                 {monthNames.map((name, i) => (
-                  <option key={i} value={i}>{name}</option>
+                  <option key={i} value={i}>
+                    {name}
+                  </option>
                 ))}
               </select>
               <select
@@ -115,7 +128,9 @@ export default function CalendarView() {
                 className="bg-workspace-bg border border-workspace-border text-workspace-text rounded-xl px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-workspace-primary/50 cursor-pointer"
               >
                 {yearOptions.map((y) => (
-                  <option key={y} value={y}>{y}</option>
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
                 ))}
               </select>
             </div>
@@ -161,18 +176,22 @@ export default function CalendarView() {
                       : 'border-workspace-border hover:border-workspace-text-secondary/30'
                   } ${bgColor}`}
                 >
-                  <span className={`text-xs font-semibold ${
-                    todayHighlight
-                      ? 'bg-workspace-primary text-white w-5 h-5 rounded-full flex items-center justify-center'
-                      : 'text-workspace-text'
-                  }`}>
+                  <span
+                    className={`text-xs font-semibold ${
+                      todayHighlight
+                        ? 'bg-workspace-primary text-white w-5 h-5 rounded-full flex items-center justify-center'
+                        : 'text-workspace-text'
+                    }`}
+                  >
                     {day.getDate()}
                   </span>
                   {stats.total > 0 && (
                     <div className="flex gap-1 items-center justify-end w-full">
-                      <div className={`w-1.5 h-1.5 rounded-full ${
-                        stats.completed === stats.total ? 'bg-[#39d353]' : 'bg-workspace-primary'
-                      }`} />
+                      <div
+                        className={`w-1.5 h-1.5 rounded-full ${
+                          stats.completed === stats.total ? 'bg-[#39d353]' : 'bg-workspace-primary'
+                        }`}
+                      />
                       <span className="text-[9px] text-workspace-text-secondary">
                         {stats.completed}/{stats.total}
                       </span>
@@ -188,7 +207,11 @@ export default function CalendarView() {
         <div className="bg-workspace-card/60 backdrop-blur-md rounded-[24px] p-6 border border-workspace-border flex flex-col h-fit lg:sticky lg:top-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-workspace-text">
-              {selectedDate?.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
+              {selectedDate?.toLocaleDateString(undefined, {
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric',
+              })}
             </h2>
             <Button
               onPress={() => {
@@ -207,13 +230,19 @@ export default function CalendarView() {
             <div className="space-y-3">
               {/* Stats bar */}
               <div className="flex items-center justify-between text-xs text-workspace-text-secondary">
-                <span>{selectedDateStats.completed}/{selectedDateStats.total} completed</span>
-                <span>{Math.round((selectedDateStats.completed / selectedDateStats.total) * 100)}%</span>
+                <span>
+                  {selectedDateStats.completed}/{selectedDateStats.total} completed
+                </span>
+                <span>
+                  {Math.round((selectedDateStats.completed / selectedDateStats.total) * 100)}%
+                </span>
               </div>
               <div className="w-full h-1.5 bg-workspace-border rounded-full overflow-hidden">
                 <div
                   className="h-full bg-[#39d353] rounded-full transition-all duration-300"
-                  style={{ width: `${(selectedDateStats.completed / selectedDateStats.total) * 100}%` }}
+                  style={{
+                    width: `${(selectedDateStats.completed / selectedDateStats.total) * 100}%`,
+                  }}
                 />
               </div>
 

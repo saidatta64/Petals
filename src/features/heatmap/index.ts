@@ -1,1 +1,1 @@
-export { default as Heatmap } from './components/Heatmap';
+export { default as Heatmap } from './components/Heatmap'

@@ -1,10 +1,10 @@
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface SidebarBrandProps {
-  isCollapsed: boolean;
-  onToggleCollapse: () => void;
+  isCollapsed: boolean
+  onToggleCollapse: () => void
 }
 
 export const SidebarBrand: React.FC<SidebarBrandProps> = ({ isCollapsed, onToggleCollapse }) => {
@@ -17,9 +17,15 @@ export const SidebarBrand: React.FC<SidebarBrandProps> = ({ isCollapsed, onToggl
         className="absolute -right-3.5 top-6 w-7 h-7 rounded-full bg-workspace-card/90 backdrop-blur-xl border border-workspace-border text-workspace-text-secondary hover:text-workspace-text hover:bg-workspace-border/80 shadow-md flex items-center justify-center transition-all duration-200 z-50 opacity-0 group-hover/sidebar:opacity-100 hover:scale-110 active:scale-95 group/btn"
       >
         {isCollapsed ? (
-          <ChevronRight size={14} className="group-hover/btn:text-workspace-primary transition-colors" />
+          <ChevronRight
+            size={14}
+            className="group-hover/btn:text-workspace-primary transition-colors"
+          />
         ) : (
-          <ChevronLeft size={14} className="group-hover/btn:text-workspace-primary transition-colors" />
+          <ChevronLeft
+            size={14}
+            className="group-hover/btn:text-workspace-primary transition-colors"
+          />
         )}
       </button>
 
@@ -51,7 +57,8 @@ export const SidebarBrand: React.FC<SidebarBrandProps> = ({ isCollapsed, onToggl
                   Petals
                 </span>
                 <span className="font-brand text-[10px] font-semibold tracking-wide text-workspace-text-secondary/80 mt-1">
-                  Focus. Plan. <span className="text-purple-500 dark:text-purple-400 font-bold">Bloom.</span>
+                  Focus. Plan.{' '}
+                  <span className="text-purple-500 dark:text-purple-400 font-bold">Bloom.</span>
                 </span>
               </motion.div>
             )}
@@ -59,5 +66,5 @@ export const SidebarBrand: React.FC<SidebarBrandProps> = ({ isCollapsed, onToggl
         </div>
       </div>
     </>
-  );
-};
+  )
+}

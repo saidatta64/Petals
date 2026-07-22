@@ -1,4 +1,13 @@
-import { LayoutGrid, CheckSquare, Calendar, BarChart3, Settings, Folder, Clock, CheckCircle2 } from 'lucide-react'
+import {
+  LayoutGrid,
+  CheckSquare,
+  Calendar,
+  BarChart3,
+  Settings,
+  Folder,
+  Clock,
+  CheckCircle2,
+} from 'lucide-react'
 
 type ViewType =
   | 'dashboard'
@@ -31,9 +40,12 @@ export default function Sidebar({ currentView, onViewChange }: SidebarProps) {
     <aside className="w-60 bg-light-surface dark:bg-dark-surface border-r border-light-border dark:border-dark-border flex flex-col h-screen">
       {/* Header */}
       <div className="p-6 border-b border-light-border dark:border-dark-border">
-        <h1 className="font-brand text-2xl font-bold text-light-text dark:text-dark-text tracking-tight leading-none">Petals</h1>
+        <h1 className="font-brand text-2xl font-bold text-light-text dark:text-dark-text tracking-tight leading-none">
+          Petals
+        </h1>
         <p className="font-brand text-xs font-semibold text-light-text-secondary dark:text-dark-text-secondary mt-1">
-          Focus. Plan. <span className="text-purple-500 dark:text-purple-400 font-bold">Bloom.</span>
+          Focus. Plan.{' '}
+          <span className="text-purple-500 dark:text-purple-400 font-bold">Bloom.</span>
         </p>
       </div>
 

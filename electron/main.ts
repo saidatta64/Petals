@@ -150,7 +150,7 @@ ipcMain.handle('notification:show', (_event, title, options) => {
 
 // Config File Helpers
 function getConfigFile() {
-  return path.join(app.getPath("userData"), "config.json")
+  return path.join(app.getPath('userData'), 'config.json')
 }
 
 function getDatabaseDirectorySetting(): string | undefined {
@@ -161,7 +161,7 @@ function getDatabaseDirectorySetting(): string | undefined {
       return config.databaseDir
     }
   } catch (err) {
-    console.error("Failed to read database directory config:", err)
+    console.error('Failed to read database directory config:', err)
   }
   return undefined
 }
@@ -176,18 +176,18 @@ function saveDatabaseDirectorySetting(dirPath: string) {
     config.databaseDir = dirPath
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2))
   } catch (err) {
-    console.error("Failed to save database directory config:", err)
+    console.error('Failed to save database directory config:', err)
   }
 }
 
 // Notes Folder Helper
 function getNotesDirectory(): string {
-  let userDataPath = app.getPath("userData")
+  let userDataPath = app.getPath('userData')
   const baseName = path.basename(userDataPath)
   if (baseName !== 'TaskFlow') {
     userDataPath = path.join(path.dirname(userDataPath), 'TaskFlow')
   }
-  const notesDir = path.join(userDataPath, "notes")
+  const notesDir = path.join(userDataPath, 'notes')
   if (!fs.existsSync(notesDir)) {
     fs.mkdirSync(notesDir, { recursive: true })
   }
@@ -205,11 +205,11 @@ function startReminderScheduler() {
 
       const now = Date.now()
       const enabledReminders = ReminderRepository.getEnabled()
-      
+
       for (const reminder of enabledReminders) {
         if (reminder.reminderTime <= now) {
           const task = TaskRepository.getById(reminder.taskId)
-          
+
           if (task && task.status === 'PENDING') {
             const notification = new Notification({
               title: 'Task Reminder ⏰',
@@ -217,7 +217,7 @@ function startReminderScheduler() {
             })
             notification.show()
           }
-          
+
           if (reminder.repeatType === 'NONE') {
             ReminderRepository.update(reminder.id, { enabled: false })
           } else {
@@ -236,19 +236,19 @@ function startReminderScheduler() {
             } else {
               nextTime += oneDay
             }
-            
+
             while (nextTime <= now) {
               if (reminder.repeatType === 'DAILY') nextTime += oneDay
               else if (reminder.repeatType === 'WEEKLY') nextTime += oneDay * 7
               else break
             }
-            
+
             ReminderRepository.update(reminder.id, { reminderTime: nextTime })
           }
         }
       }
     } catch (err) {
-      console.error("Error in reminder scheduler loop:", err)
+      console.error('Error in reminder scheduler loop:', err)
     }
   }, 30000)
 }
@@ -260,11 +260,11 @@ ipcMain.handle('db:selectPath', async () => {
     title: 'Choose Database Directory',
     properties: ['openDirectory', 'createDirectory'],
   })
-  
+
   if (result.canceled || result.filePaths.length === 0) {
     return null
   }
-  
+
   const selectedDir = result.filePaths[0]
   saveDatabaseDirectorySetting(selectedDir)
   return selectedDir
@@ -273,8 +273,8 @@ ipcMain.handle('db:selectPath', async () => {
 ipcMain.handle('db:getPath', () => {
   const customDir = getDatabaseDirectorySetting()
   if (customDir) return customDir
-  
-  let userDataPath = app.getPath("userData")
+
+  let userDataPath = app.getPath('userData')
   const baseName = path.basename(userDataPath)
   if (baseName !== 'TaskFlow') {
     userDataPath = path.join(path.dirname(userDataPath), 'TaskFlow')
@@ -287,8 +287,8 @@ ipcMain.handle('notes:list', () => {
     const notesDir = getNotesDirectory()
     const files = fs.readdirSync(notesDir)
     return files
-      .filter(file => file.endsWith('.txt'))
-      .map(file => {
+      .filter((file) => file.endsWith('.txt'))
+      .map((file) => {
         const filePath = path.join(notesDir, file)
         const stats = fs.statSync(filePath)
         let content = ''
@@ -301,11 +301,11 @@ ipcMain.handle('notes:list', () => {
           filename: file,
           path: filePath,
           updatedAt: stats.mtimeMs,
-          content
+          content,
         }
       })
   } catch (err) {
-    console.error("Failed to list notes:", err)
+    console.error('Failed to list notes:', err)
     return []
   }
 })
@@ -319,7 +319,7 @@ ipcMain.handle('notes:read', (_event, filename: string) => {
     }
     return ''
   } catch (err) {
-    console.error("Failed to read note:", err)
+    console.error('Failed to read note:', err)
     return ''
   }
 })
@@ -331,7 +331,7 @@ ipcMain.handle('notes:write', (_event, filename: string, content: string) => {
     fs.writeFileSync(filePath, content, 'utf-8')
     return { success: true, path: filePath }
   } catch (err) {
-    console.error("Failed to write note:", err)
+    console.error('Failed to write note:', err)
     return { success: false, error: String(err) }
   }
 })
@@ -345,7 +345,7 @@ ipcMain.handle('notes:delete', (_event, filename: string) => {
     }
     return { success: true }
   } catch (err) {
-    console.error("Failed to delete note:", err)
+    console.error('Failed to delete note:', err)
     return { success: false, error: String(err) }
   }
 })
@@ -357,11 +357,11 @@ ipcMain.handle('notes:openExternalDialog', async () => {
     properties: ['openFile'],
     filters: [{ name: 'Text Files', extensions: ['txt', 'md', 'json', 'css', 'js', 'ts', 'tsx'] }],
   })
-  
+
   if (result.canceled || result.filePaths.length === 0) {
     return null
   }
-  
+
   const filePath = result.filePaths[0]
   try {
     const content = fs.readFileSync(filePath, 'utf-8')
@@ -373,7 +373,7 @@ ipcMain.handle('notes:openExternalDialog', async () => {
       updatedAt: stats.mtimeMs,
     }
   } catch (err) {
-    console.error("Failed to read external file:", err)
+    console.error('Failed to read external file:', err)
     return null
   }
 })
@@ -385,7 +385,7 @@ ipcMain.handle('notes:readExternal', (_event, filePath: string) => {
     }
     return ''
   } catch (err) {
-    console.error("Failed to read external file:", err)
+    console.error('Failed to read external file:', err)
     return ''
   }
 })
@@ -395,7 +395,7 @@ ipcMain.handle('notes:writeExternal', (_event, filePath: string, content: string
     fs.writeFileSync(filePath, content, 'utf-8')
     return { success: true }
   } catch (err) {
-    console.error("Failed to write external file:", err)
+    console.error('Failed to write external file:', err)
     return { success: false, error: String(err) }
   }
 })
@@ -409,7 +409,7 @@ ipcMain.handle('notes:openInExplorer', (_event, filePath?: string) => {
     }
     return { success: false }
   } catch (err) {
-    console.error("Failed to open path:", err)
+    console.error('Failed to open path:', err)
     return { success: false }
   }
 })

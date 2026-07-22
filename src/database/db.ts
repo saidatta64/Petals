@@ -14,14 +14,14 @@ export function initializeDatabase(customDir?: string) {
 
   let dbPath: string
   if (customDir) {
-    dbPath = path.join(customDir, "taskflow.db")
+    dbPath = path.join(customDir, 'taskflow.db')
   } else {
-    let userDataPath = app.getPath("userData")
+    let userDataPath = app.getPath('userData')
     const baseName = path.basename(userDataPath)
     if (baseName !== 'TaskFlow') {
       userDataPath = path.join(path.dirname(userDataPath), 'TaskFlow')
     }
-    dbPath = path.join(userDataPath, "taskflow.db")
+    dbPath = path.join(userDataPath, 'taskflow.db')
   }
 
   // Automatically create directory if it doesn't exist
@@ -32,8 +32,8 @@ export function initializeDatabase(customDir?: string) {
 
   const sqlite = new Database(dbPath)
   rawSqlite = sqlite
-  sqlite.pragma("journal_mode = WAL")
-  sqlite.pragma("foreign_keys = ON")
+  sqlite.pragma('journal_mode = WAL')
+  sqlite.pragma('foreign_keys = ON')
 
   db = drizzle(sqlite, { schema: schema })
 
@@ -44,7 +44,6 @@ export function initializeDatabase(customDir?: string) {
 }
 
 function createTables(sqlite: SqliteDatabase) {
-
   // Create categories table
   sqlite.exec(`
     CREATE TABLE IF NOT EXISTS categories (
@@ -118,7 +117,6 @@ function createTables(sqlite: SqliteDatabase) {
 }
 
 function seedDefaultCategories(sqlite: SqliteDatabase) {
-
   const defaultCategories = [
     { name: 'Study', color: '#3B82F6' },
     { name: 'Development', color: '#22C55E' },
@@ -129,9 +127,9 @@ function seedDefaultCategories(sqlite: SqliteDatabase) {
   const now = Date.now()
 
   for (const category of defaultCategories) {
-    sqlite.prepare(
-      `INSERT OR IGNORE INTO categories (name, color, created_at) VALUES (?, ?, ?)`,
-    ).run(category.name, category.color, now)
+    sqlite
+      .prepare(`INSERT OR IGNORE INTO categories (name, color, created_at) VALUES (?, ?, ?)`)
+      .run(category.name, category.color, now)
   }
 }
 

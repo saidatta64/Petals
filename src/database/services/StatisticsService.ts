@@ -111,7 +111,7 @@ export class StatisticsService {
   static getWeeklyStats() {
     const allTasks = TaskRepository.getAll()
     const now = new Date()
-    
+
     // Start of current week (Sunday 00:00:00.000)
     const startOfWeek = new Date(now)
     startOfWeek.setHours(0, 0, 0, 0)
@@ -127,7 +127,10 @@ export class StatisticsService {
 
     for (const task of allTasks) {
       if (task.status === 'COMPLETED' && task.completedAt) {
-        const compTime = typeof task.completedAt === 'number' ? task.completedAt : new Date(task.completedAt).getTime()
+        const compTime =
+          typeof task.completedAt === 'number'
+            ? task.completedAt
+            : new Date(task.completedAt).getTime()
         if (compTime >= startOfWeek.getTime() && compTime < endOfWeek.getTime()) {
           const date = new Date(compTime)
           const dayName = weekDays[date.getDay()]
@@ -148,8 +151,18 @@ export class StatisticsService {
     const currentYear = now.getFullYear()
 
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ]
     const stats = new Map<string, number>()
     months.forEach((month) => stats.set(month, 0))

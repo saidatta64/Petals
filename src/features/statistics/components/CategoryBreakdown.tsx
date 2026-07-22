@@ -1,15 +1,15 @@
-import React from 'react';
+import React from 'react'
 
 export interface CategoryStats {
-  categoryId: number;
-  categoryName: string;
-  completed: number;
-  pending: number;
-  total: number;
+  categoryId: number
+  categoryName: string
+  completed: number
+  pending: number
+  total: number
 }
 
 interface CategoryBreakdownProps {
-  categories: CategoryStats[];
+  categories: CategoryStats[]
 }
 
 export const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({ categories }) => {
@@ -21,7 +21,7 @@ export const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({ categories
         </h2>
         <div className="space-y-4 max-h-64 overflow-y-auto pr-1">
           {categories.map((c) => {
-            const completionPct = c.total > 0 ? (c.completed / c.total) * 100 : 0;
+            const completionPct = c.total > 0 ? (c.completed / c.total) * 100 : 0
             return (
               <div key={c.categoryId} className="space-y-2">
                 <div className="flex justify-between text-sm font-medium">
@@ -37,7 +37,7 @@ export const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({ categories
                   />
                 </div>
               </div>
-            );
+            )
           })}
           {categories.length === 0 && (
             <p className="text-workspace-text-secondary text-sm text-center py-8">
@@ -47,5 +47,5 @@ export const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({ categories
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

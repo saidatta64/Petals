@@ -1,10 +1,10 @@
-import React from 'react';
-import { HeatmapStats } from '../utils/heatmapUtils';
+import React from 'react'
+import { HeatmapStats } from '../utils/heatmapUtils'
 
 interface HeatmapHeaderProps {
-  stats: HeatmapStats;
-  range: number;
-  onRangeChange: (range: number) => void;
+  stats: HeatmapStats
+  range: number
+  onRangeChange: (range: number) => void
 }
 
 export const HeatmapHeader: React.FC<HeatmapHeaderProps> = ({ stats, range, onRangeChange }) => {
@@ -14,10 +14,12 @@ export const HeatmapHeader: React.FC<HeatmapHeaderProps> = ({ stats, range, onRa
         <h2 className="font-brand text-base font-bold text-workspace-text">Consistency Graph</h2>
         <div className="flex items-center gap-2">
           <span className="bg-workspace-bg/80 border border-workspace-border/60 text-workspace-text-secondary text-xs px-3 py-1 rounded-full font-medium shadow-xs">
-            Active days: <strong className="text-workspace-text font-bold ml-1">{stats.activeDays}</strong>
+            Active days:{' '}
+            <strong className="text-workspace-text font-bold ml-1">{stats.activeDays}</strong>
           </span>
           <span className="bg-workspace-bg/80 border border-workspace-border/60 text-workspace-text-secondary text-xs px-3 py-1 rounded-full font-medium shadow-xs">
-            Max streak: <strong className="text-workspace-text font-bold ml-1">{stats.maxStreak} 🔥</strong>
+            Max streak:{' '}
+            <strong className="text-workspace-text font-bold ml-1">{stats.maxStreak} 🔥</strong>
           </span>
         </div>
       </div>
@@ -32,5 +34,5 @@ export const HeatmapHeader: React.FC<HeatmapHeaderProps> = ({ stats, range, onRa
         <option value={365}>1 Year</option>
       </select>
     </div>
-  );
-};
+  )
+}

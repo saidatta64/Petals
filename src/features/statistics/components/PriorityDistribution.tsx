@@ -1,14 +1,14 @@
-import React from 'react';
+import React from 'react'
 
 export interface PriorityStats {
-  priority: 'HIGH' | 'MEDIUM' | 'LOW';
-  completed: number;
-  pending: number;
-  total: number;
+  priority: 'HIGH' | 'MEDIUM' | 'LOW'
+  completed: number
+  pending: number
+  total: number
 }
 
 interface PriorityDistributionProps {
-  priorities: PriorityStats[];
+  priorities: PriorityStats[]
 }
 
 export const PriorityDistribution: React.FC<PriorityDistributionProps> = ({ priorities }) => {
@@ -19,13 +19,13 @@ export const PriorityDistribution: React.FC<PriorityDistributionProps> = ({ prio
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {priorities.map((p) => {
-          const pct = p.total > 0 ? (p.completed / p.total) * 100 : 0;
+          const pct = p.total > 0 ? (p.completed / p.total) * 100 : 0
           const colorClass =
             p.priority === 'HIGH'
               ? 'bg-workspace-red'
               : p.priority === 'MEDIUM'
-              ? 'bg-workspace-yellow'
-              : 'bg-workspace-primary';
+                ? 'bg-workspace-yellow'
+                : 'bg-workspace-primary'
           return (
             <div
               key={p.priority}
@@ -50,9 +50,9 @@ export const PriorityDistribution: React.FC<PriorityDistributionProps> = ({ prio
                 </div>
               </div>
             </div>
-          );
+          )
         })}
       </div>
     </div>
-  );
-};
+  )
+}

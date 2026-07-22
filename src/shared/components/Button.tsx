@@ -19,11 +19,14 @@ export default function Button({
   className = '',
   type = 'button',
 }: ButtonProps) {
-  const baseStyles = 'font-medium rounded-button transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2'
+  const baseStyles =
+    'font-medium rounded-button transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2'
 
   const variantStyles = {
-    primary: 'bg-light-primary dark:bg-dark-primary text-white hover:opacity-90 disabled:opacity-50',
-    secondary: 'bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text border border-light-border dark:border-dark-border hover:bg-light-border dark:hover:bg-dark-border disabled:opacity-50',
+    primary:
+      'bg-light-primary dark:bg-dark-primary text-white hover:opacity-90 disabled:opacity-50',
+    secondary:
+      'bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text border border-light-border dark:border-dark-border hover:bg-light-border dark:hover:bg-dark-border disabled:opacity-50',
     danger: 'bg-light-danger dark:bg-dark-danger text-white hover:opacity-90 disabled:opacity-50',
   }
 

@@ -1,11 +1,11 @@
-import React from 'react';
-import { Moon, Sun } from 'lucide-react';
-import { HeaderSearch } from './components/HeaderSearch';
-import { HeaderNotifications } from './components/HeaderNotifications';
+import React from 'react'
+import { Moon, Sun } from 'lucide-react'
+import { HeaderSearch } from './components/HeaderSearch'
+import { HeaderNotifications } from './components/HeaderNotifications'
 
 interface MinimalHeaderProps {
-  isDarkMode: boolean;
-  onToggleTheme: () => void;
+  isDarkMode: boolean
+  onToggleTheme: () => void
 }
 
 export const MinimalHeader: React.FC<MinimalHeaderProps> = ({ isDarkMode, onToggleTheme }) => {
@@ -27,5 +27,5 @@ export const MinimalHeader: React.FC<MinimalHeaderProps> = ({ isDarkMode, onTogg
         <HeaderNotifications />
       </div>
     </header>
-  );
-};
+  )
+}

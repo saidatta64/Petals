@@ -15,12 +15,12 @@ export const usePomodoroStore = create<PomodoroStore>((set) => ({
   isActive: false,
 
   startTimer: () => set({ isActive: true }),
-  
+
   pauseTimer: () => set({ isActive: false }),
-  
+
   resetTimer: () => set({ isActive: false, timeLeft: 25 * 60 }),
 
   setTimeLeft: (time: number) => set({ timeLeft: time }),
-  
+
   setIsActive: (active: boolean) => set({ isActive: active }),
 }))

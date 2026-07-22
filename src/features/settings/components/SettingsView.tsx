@@ -10,7 +10,7 @@ export default function SettingsView() {
   const [dbPath, setDbPath] = useState('')
   const [isSaved, setIsSaved] = useState(false)
   const [newCategoryName, setNewCategoryName] = useState('')
-  
+
   const categories = useCategoryStore((state) => state.categories)
   const createCategory = useCategoryStore((state) => state.createCategory)
   const deleteCategory = useCategoryStore((state) => state.deleteCategory)
@@ -48,7 +48,9 @@ export default function SettingsView() {
       const selected = await window.taskflow.db.selectPath()
       if (selected) {
         setDbPath(selected)
-        alert('Database storage folder updated! The app will now restart to switch to the new folder.')
+        alert(
+          'Database storage folder updated! The app will now restart to switch to the new folder.',
+        )
         window.taskflow.app.relaunch()
       }
     }
@@ -68,7 +70,20 @@ export default function SettingsView() {
   const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newCategoryName.trim()) return
-    const colors = ['#E57373', '#F06292', '#BA68C8', '#9575CD', '#7986CB', '#64B5F6', '#4FC3F7', '#4DD0E1', '#4DB6AC', '#81C784', '#AED581', '#FF8A65']
+    const colors = [
+      '#E57373',
+      '#F06292',
+      '#BA68C8',
+      '#9575CD',
+      '#7986CB',
+      '#64B5F6',
+      '#4FC3F7',
+      '#4DD0E1',
+      '#4DB6AC',
+      '#81C784',
+      '#AED581',
+      '#FF8A65',
+    ]
     const randomColor = colors[Math.floor(Math.random() * colors.length)]
     await createCategory({ name: newCategoryName.trim(), color: randomColor })
     setNewCategoryName('')
@@ -160,7 +175,9 @@ export default function SettingsView() {
         <div className="border-t border-workspace-border pt-6 flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-workspace-text text-lg">Database Storage Location</h3>
+              <h3 className="font-semibold text-workspace-text text-lg">
+                Database Storage Location
+              </h3>
               <p className="text-sm text-workspace-text-secondary">
                 The folder where your local SQLite database is stored.
               </p>
@@ -172,7 +189,10 @@ export default function SettingsView() {
               Move/Select Folder...
             </button>
           </div>
-          <span className="text-xs font-mono text-workspace-text bg-workspace-bg border border-workspace-border/60 p-2 rounded-xl truncate" title={dbPath}>
+          <span
+            className="text-xs font-mono text-workspace-text bg-workspace-bg border border-workspace-border/60 p-2 rounded-xl truncate"
+            title={dbPath}
+          >
             {dbPath || 'Loading...'}
           </span>
         </div>
@@ -203,9 +223,15 @@ export default function SettingsView() {
 
         <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
           {categories.map((cat) => (
-            <div key={cat.id} className="flex items-center justify-between bg-workspace-bg border border-workspace-border rounded-xl p-3">
+            <div
+              key={cat.id}
+              className="flex items-center justify-between bg-workspace-bg border border-workspace-border rounded-xl p-3"
+            >
               <div className="flex items-center gap-3">
-                <div className="w-4 h-4 rounded-full shadow-sm" style={{ backgroundColor: cat.color }} />
+                <div
+                  className="w-4 h-4 rounded-full shadow-sm"
+                  style={{ backgroundColor: cat.color }}
+                />
                 <span className="font-medium text-workspace-text">{cat.name}</span>
               </div>
               <button
@@ -220,7 +246,9 @@ export default function SettingsView() {
                 }}
                 disabled={categories.length <= 1}
                 className="p-2 text-workspace-text-secondary hover:text-workspace-red hover:bg-workspace-red/10 rounded-lg transition-colors disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-workspace-text-secondary"
-                title={categories.length <= 1 ? "Cannot delete the last category" : "Delete category"}
+                title={
+                  categories.length <= 1 ? 'Cannot delete the last category' : 'Delete category'
+                }
               >
                 <Trash2 size={16} />
               </button>
@@ -228,7 +256,10 @@ export default function SettingsView() {
           ))}
         </div>
 
-        <form onSubmit={handleAddCategory} className="flex items-center gap-3 border-t border-workspace-border pt-6">
+        <form
+          onSubmit={handleAddCategory}
+          className="flex items-center gap-3 border-t border-workspace-border pt-6"
+        >
           <input
             type="text"
             value={newCategoryName}
@@ -245,7 +276,6 @@ export default function SettingsView() {
           </button>
         </form>
       </div>
-
     </div>
   )
 }

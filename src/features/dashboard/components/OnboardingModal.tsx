@@ -1,13 +1,14 @@
-import React from 'react';
-import { Button } from '@heroui/react';
+import React from 'react'
+import { createPortal } from 'react-dom'
+import { Button } from '@heroui/react'
 
 interface OnboardingModalProps {
-  showOnboarding: boolean;
-  nameInput: string;
-  dbPath: string;
-  onNameChange: (name: string) => void;
-  onSaveName: () => void;
-  onSelectDbPath: () => void;
+  showOnboarding: boolean
+  nameInput: string
+  dbPath: string
+  onNameChange: (name: string) => void
+  onSaveName: () => void
+  onSelectDbPath: () => void
 }
 
 export const OnboardingModal: React.FC<OnboardingModalProps> = ({
@@ -18,9 +19,9 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   onSaveName,
   onSelectDbPath,
 }) => {
-  if (!showOnboarding) return null;
+  if (!showOnboarding) return null
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
       <div className="bg-workspace-card border border-workspace-border rounded-[24px] p-8 max-w-md w-full shadow-2xl space-y-6">
         <div className="space-y-2 text-center">
@@ -38,7 +39,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               onChange={(e) => onNameChange(e.target.value)}
               placeholder="Your name..."
               onKeyDown={(e) => {
-                if (e.key === 'Enter') onSaveName();
+                if (e.key === 'Enter') onSaveName()
               }}
               className="w-full bg-workspace-bg text-workspace-text border border-workspace-border rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-workspace-primary/50 transition-shadow"
               autoFocus
@@ -50,8 +51,8 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               Database Storage Location
             </span>
             <p className="text-[10px] text-workspace-text-secondary leading-relaxed">
-              By default, data is stored on C: drive. If you prefer, select a folder on another drive
-              (e.g., D: drive) to avoid C: drive space issues.
+              By default, data is stored on C: drive. If you prefer, select a folder on another
+              drive (e.g., D: drive) to avoid C: drive space issues.
             </p>
             <div className="flex flex-col gap-2 mt-2">
               <span
@@ -79,6 +80,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           </Button>
         </div>
       </div>
-    </div>
-  );
-};
+    </div>,
+    document.body,
+  )
+}

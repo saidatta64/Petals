@@ -10,7 +10,12 @@ interface TaskDialogProps {
   initialTask?: Task | null
 }
 
-export default function TaskDialog({ isOpen, onClose, initialDueDate, initialTask }: TaskDialogProps) {
+export default function TaskDialog({
+  isOpen,
+  onClose,
+  initialDueDate,
+  initialTask,
+}: TaskDialogProps) {
   const createTask = useTaskStore((state) => state.createTask)
   const editTask = useTaskStore((state) => state.editTask)
   const categories = useCategoryStore((state) => state.categories)
@@ -33,7 +38,7 @@ export default function TaskDialog({ isOpen, onClose, initialDueDate, initialTas
 
   useEffect(() => {
     if (categories.length > 0 && !initialTask) {
-      const exists = categories.some(cat => cat.id === categoryId)
+      const exists = categories.some((cat) => cat.id === categoryId)
       if (!exists) {
         setCategoryId(categories[0].id)
       }
@@ -46,7 +51,7 @@ export default function TaskDialog({ isOpen, onClose, initialDueDate, initialTas
       setDescription(initialTask.description || '')
       setCategoryId(initialTask.categoryId || (categories.length > 0 ? categories[0].id : 1))
       setPriority(initialTask.priority || 'MEDIUM')
-      
+
       if (initialTask.dueDate) {
         const dateStr = new Date(initialTask.dueDate - new Date().getTimezoneOffset() * 60000)
           .toISOString()
@@ -55,7 +60,7 @@ export default function TaskDialog({ isOpen, onClose, initialDueDate, initialTas
       } else {
         setDueDate('')
       }
-      
+
       const daily = initialTask.recurringType === 'DAILY'
       setIsDaily(daily)
       if (daily && initialTask.recurringInterval) {
@@ -67,7 +72,9 @@ export default function TaskDialog({ isOpen, onClose, initialDueDate, initialTas
       }
     } else if (initialDueDate) {
       resetForm()
-      const dateStr = new Date(initialDueDate.getTime() - initialDueDate.getTimezoneOffset() * 60000)
+      const dateStr = new Date(
+        initialDueDate.getTime() - initialDueDate.getTimezoneOffset() * 60000,
+      )
         .toISOString()
         .split('T')[0]
       setDueDate(dateStr)
@@ -102,17 +109,17 @@ export default function TaskDialog({ isOpen, onClose, initialDueDate, initialTas
     setIsSubmitting(true)
     setError('')
 
-    let parsedDueDate: number | undefined = undefined;
+    let parsedDueDate: number | undefined = undefined
     if (dueDate) {
       const dateObj = new Date(dueDate)
       dateObj.setHours(23, 59, 59, 999)
       parsedDueDate = dateObj.getTime()
     }
 
-    let recurringInterval: number | undefined = undefined;
+    let recurringInterval: number | undefined = undefined
     if (isDaily) {
       const [hours, minutes] = resetTime.split(':').map(Number)
-      recurringInterval = (hours * 60) + minutes
+      recurringInterval = hours * 60 + minutes
     }
 
     try {
@@ -124,7 +131,7 @@ export default function TaskDialog({ isOpen, onClose, initialDueDate, initialTas
           priority: priority,
           dueDate: parsedDueDate,
           recurringType: isDaily ? 'DAILY' : 'NONE',
-          recurringInterval: recurringInterval
+          recurringInterval: recurringInterval,
         })
       } else {
         await createTask({
@@ -134,7 +141,7 @@ export default function TaskDialog({ isOpen, onClose, initialDueDate, initialTas
           priority: priority,
           dueDate: parsedDueDate,
           recurringType: isDaily ? 'DAILY' : 'NONE',
-          recurringInterval: recurringInterval
+          recurringInterval: recurringInterval,
         })
       }
       handleClose()
@@ -146,7 +153,7 @@ export default function TaskDialog({ isOpen, onClose, initialDueDate, initialTas
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title={initialTask ? "Edit Task" : "New Task"}>
+    <Modal isOpen={isOpen} onClose={handleClose} title={initialTask ? 'Edit Task' : 'New Task'}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-workspace-text-secondary mb-1">
@@ -222,7 +229,7 @@ export default function TaskDialog({ isOpen, onClose, initialDueDate, initialTas
 
         <div className="pt-2 border-t border-workspace-border">
           <label className="flex items-center gap-2 cursor-pointer group">
-            <input 
+            <input
               type="checkbox"
               checked={isDaily}
               onChange={(e) => setIsDaily(e.target.checked)}
@@ -256,15 +263,15 @@ export default function TaskDialog({ isOpen, onClose, initialDueDate, initialTas
 
         <div className="flex items-center justify-end pt-4">
           <div className="flex gap-3">
-            <button 
-              onClick={handleClose} 
+            <button
+              onClick={handleClose}
               type="button"
               className="px-4 py-2 rounded-xl text-sm font-medium text-workspace-text-secondary hover:bg-workspace-border/50 transition-colors"
             >
               Cancel
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={isSubmitting}
               className="px-6 py-2 rounded-xl text-sm font-semibold bg-workspace-primary text-white shadow-lg shadow-workspace-primary/20 hover:bg-workspace-primary/90 transition-colors disabled:opacity-50"
             >

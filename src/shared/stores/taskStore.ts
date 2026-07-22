@@ -152,22 +152,22 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     set({ isLoading: true })
     try {
       const tasks = (await window.taskflow.tasks.getAll()) as Task[]
-      
+
       // Auto-reset daily tasks based on exact time of day
       const now = Date.now()
-      
-      const tasksToReset = tasks.filter(t => {
+
+      const tasksToReset = tasks.filter((t) => {
         if (t.recurringType === 'DAILY' && t.status === 'COMPLETED' && t.completedAt) {
-          const resetTimeMinutes = t.recurringInterval || 0; 
-          const completedDate = new Date(t.completedAt);
-          const resetDate = new Date(completedDate);
-          resetDate.setHours(Math.floor(resetTimeMinutes / 60), resetTimeMinutes % 60, 0, 0);
+          const resetTimeMinutes = t.recurringInterval || 0
+          const completedDate = new Date(t.completedAt)
+          const resetDate = new Date(completedDate)
+          resetDate.setHours(Math.floor(resetTimeMinutes / 60), resetTimeMinutes % 60, 0, 0)
 
           if (resetDate.getTime() <= completedDate.getTime()) {
-            resetDate.setDate(resetDate.getDate() + 1);
+            resetDate.setDate(resetDate.getDate() + 1)
           }
 
-          return now >= resetDate.getTime();
+          return now >= resetDate.getTime()
         }
         return false
       })
@@ -175,13 +175,12 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       for (const t of tasksToReset) {
         await window.taskflow.tasks.update(t.id, {
           status: 'PENDING',
-          completedAt: undefined
+          completedAt: undefined,
         })
       }
 
-      const finalTasks = tasksToReset.length > 0 
-        ? (await window.taskflow.tasks.getAll()) as Task[]
-        : tasks
+      const finalTasks =
+        tasksToReset.length > 0 ? ((await window.taskflow.tasks.getAll()) as Task[]) : tasks
 
       set({ tasks: finalTasks })
     } finally {

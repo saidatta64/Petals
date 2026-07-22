@@ -17,7 +17,7 @@ export default function Select({ value, onChange, options, placeholder }: Select
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const selectedOption = options.find(opt => opt.value === value)
+  const selectedOption = options.find((opt) => opt.value === value)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -36,8 +36,11 @@ export default function Select({ value, onChange, options, placeholder }: Select
         onClick={() => setIsOpen(!isOpen)}
         className="w-full bg-workspace-bg border border-workspace-border text-workspace-text rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-workspace-primary/50 transition-shadow flex items-center justify-between"
       >
-        <span>{selectedOption ? selectedOption.label : (placeholder || 'Select...')}</span>
-        <ChevronDown size={16} className={`text-workspace-text-secondary transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        <span>{selectedOption ? selectedOption.label : placeholder || 'Select...'}</span>
+        <ChevronDown
+          size={16}
+          className={`text-workspace-text-secondary transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+        />
       </button>
 
       {isOpen && (
@@ -51,7 +54,9 @@ export default function Select({ value, onChange, options, placeholder }: Select
                 setIsOpen(false)
               }}
               className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-workspace-bg ${
-                value === option.value ? 'text-workspace-primary bg-workspace-primary/10' : 'text-workspace-text'
+                value === option.value
+                  ? 'text-workspace-primary bg-workspace-primary/10'
+                  : 'text-workspace-text'
               }`}
             >
               {option.label}

@@ -12,7 +12,10 @@ export default function TopBar({ isDarkMode, onThemeToggle, onAddTask }: TopBarP
       {/* Search */}
       <div className="flex-1 max-w-md">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-secondary dark:text-dark-text-secondary" size={18} />
+          <Search
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-text-secondary dark:text-dark-text-secondary"
+            size={18}
+          />
           <input
             type="text"
             placeholder="Search tasks..."

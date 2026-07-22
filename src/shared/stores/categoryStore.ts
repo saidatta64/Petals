@@ -11,7 +11,7 @@ interface CategoryStore {
   categories: Category[]
   isLoading: boolean
   setCategories: (categories: Category[]) => void
-  createCategory: (input: { name: string, color: string }) => Promise<void>
+  createCategory: (input: { name: string; color: string }) => Promise<void>
   updateCategory: (id: number, category: Partial<Category>) => void
   deleteCategory: (id: number) => Promise<void>
   getCategories: () => Category[]
@@ -25,7 +25,7 @@ export const useCategoryStore = create<CategoryStore>((set, get) => ({
 
   setCategories: (categories: Category[]) => set({ categories }),
 
-  createCategory: async (input: { name: string, color: string }) => {
+  createCategory: async (input: { name: string; color: string }) => {
     if (!window.taskflow) return
     await window.taskflow.categories.create(input)
     await get().loadCategories()
@@ -33,9 +33,7 @@ export const useCategoryStore = create<CategoryStore>((set, get) => ({
 
   updateCategory: (id: number, updates: Partial<Category>) =>
     set((state) => ({
-      categories: state.categories.map((cat) =>
-        cat.id === id ? { ...cat, ...updates } : cat,
-      ),
+      categories: state.categories.map((cat) => (cat.id === id ? { ...cat, ...updates } : cat)),
     })),
 
   deleteCategory: async (id: number) => {
@@ -46,8 +44,7 @@ export const useCategoryStore = create<CategoryStore>((set, get) => ({
 
   getCategories: () => get().categories,
 
-  getCategoryById: (id: number) =>
-    get().categories.find((cat) => cat.id === id),
+  getCategoryById: (id: number) => get().categories.find((cat) => cat.id === id),
 
   loadCategories: async () => {
     if (!window.taskflow) return

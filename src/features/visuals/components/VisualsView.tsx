@@ -18,15 +18,13 @@ export default function VisualsView() {
   const handleCanvasChange = (type: CanvasType) => {
     setCanvasType(type)
     localStorage.setItem('petals_canvas_preference', type)
-  };
+  }
 
   const handleRefresh = () => {
-    setRefreshKey(prev => prev + 1)
-  };
+    setRefreshKey((prev) => prev + 1)
+  }
 
-  const iframeSrc = canvasType === 'excalidraw' 
-    ? 'https://excalidraw.com' 
-    : 'https://tldraw.com'
+  const iframeSrc = canvasType === 'excalidraw' ? 'https://excalidraw.com' : 'https://tldraw.com'
 
   return (
     <div className="flex flex-col h-full w-full overflow-hidden bg-workspace-card/5">

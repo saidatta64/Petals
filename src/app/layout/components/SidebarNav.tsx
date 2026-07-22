@@ -1,17 +1,17 @@
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export interface NavItem {
-  id: string;
-  label: string;
-  icon: React.ElementType;
+  id: string
+  label: string
+  icon: React.ElementType
 }
 
 interface SidebarNavProps {
-  navItems: NavItem[];
-  currentView: string;
-  isCollapsed: boolean;
-  onViewChange: (view: string) => void;
+  navItems: NavItem[]
+  currentView: string
+  isCollapsed: boolean
+  onViewChange: (view: string) => void
 }
 
 export const SidebarNav: React.FC<SidebarNavProps> = ({
@@ -23,8 +23,8 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
   return (
     <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
       {navItems.map((item) => {
-        const isActive = currentView === item.id;
-        const Icon = item.icon;
+        const isActive = currentView === item.id
+        const Icon = item.icon
 
         return (
           <button
@@ -72,8 +72,8 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
               </AnimatePresence>
             </div>
           </button>
-        );
+        )
       })}
     </nav>
-  );
-};
+  )
+}

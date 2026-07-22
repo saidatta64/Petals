@@ -34,7 +34,8 @@ export class TaskRepository {
         categoryId: input.categoryId,
         priority: input.priority,
         dueDate: input.dueDate,
-        recurringType: (input.recurringType || 'NONE') as typeof schema.tasks.recurringType.enumValues[number],
+        recurringType: (input.recurringType ||
+          'NONE') as (typeof schema.tasks.recurringType.enumValues)[number],
         recurringInterval: input.recurringInterval,
         createdAt: now,
         updatedAt: now,
@@ -45,9 +46,11 @@ export class TaskRepository {
   }
 
   static getById(id: number) {
-    return getDatabase().query.tasks.findFirst({
-      where: eq(schema.tasks.id, id),
-    }).sync()
+    return getDatabase()
+      .query.tasks.findFirst({
+        where: eq(schema.tasks.id, id),
+      })
+      .sync()
   }
 
   static getAll() {
@@ -55,15 +58,19 @@ export class TaskRepository {
   }
 
   static getByStatus(status: 'PENDING' | 'COMPLETED') {
-    return getDatabase().query.tasks.findMany({
-      where: eq(schema.tasks.status, status),
-    }).sync()
+    return getDatabase()
+      .query.tasks.findMany({
+        where: eq(schema.tasks.status, status),
+      })
+      .sync()
   }
 
   static getByCategoryId(categoryId: number) {
-    return getDatabase().query.tasks.findMany({
-      where: eq(schema.tasks.categoryId, categoryId),
-    }).sync()
+    return getDatabase()
+      .query.tasks.findMany({
+        where: eq(schema.tasks.categoryId, categoryId),
+      })
+      .sync()
   }
 
   static getToday() {
@@ -73,21 +80,23 @@ export class TaskRepository {
     const endOfDay = new Date(now)
     endOfDay.setHours(23, 59, 59, 999)
 
-    return getDatabase().query.tasks.findMany({
-      where: and(
-        eq(schema.tasks.status, 'PENDING'),
-        or(
-          and(
-            gte(schema.tasks.dueDate, startOfDay.getTime()),
-            lte(schema.tasks.dueDate, endOfDay.getTime())
+    return getDatabase()
+      .query.tasks.findMany({
+        where: and(
+          eq(schema.tasks.status, 'PENDING'),
+          or(
+            and(
+              gte(schema.tasks.dueDate, startOfDay.getTime()),
+              lte(schema.tasks.dueDate, endOfDay.getTime()),
+            ),
+            and(
+              gte(schema.tasks.createdAt, startOfDay.getTime()),
+              lte(schema.tasks.createdAt, endOfDay.getTime()),
+            ),
           ),
-          and(
-            gte(schema.tasks.createdAt, startOfDay.getTime()),
-            lte(schema.tasks.createdAt, endOfDay.getTime())
-          )
-        )
-      ),
-    }).sync()
+        ),
+      })
+      .sync()
   }
 
   static update(id: number, input: UpdateTaskInput) {
@@ -124,13 +133,17 @@ export class TaskRepository {
   }
 
   static getCompletedCount(startDate: number, endDate: number) {
-    return getDatabase().select().from(schema.tasks).where(
-      and(
-        eq(schema.tasks.status, 'COMPLETED'),
-        gte(schema.tasks.completedAt, startDate),
-        lte(schema.tasks.completedAt, endDate),
-      ),
-    ).all().length
+    return getDatabase()
+      .select()
+      .from(schema.tasks)
+      .where(
+        and(
+          eq(schema.tasks.status, 'COMPLETED'),
+          gte(schema.tasks.completedAt, startDate),
+          lte(schema.tasks.completedAt, endDate),
+        ),
+      )
+      .all().length
   }
 
   static getCompletedByDate(date: Date) {
@@ -139,21 +152,25 @@ export class TaskRepository {
     const endOfDay = new Date(date)
     endOfDay.setHours(23, 59, 59, 999)
 
-    return getDatabase().query.tasks.findMany({
-      where: and(
-        eq(schema.tasks.status, 'COMPLETED'),
-        gte(schema.tasks.completedAt, startOfDay.getTime()),
-        lte(schema.tasks.completedAt, endOfDay.getTime()),
-      ),
-    }).sync()
+    return getDatabase()
+      .query.tasks.findMany({
+        where: and(
+          eq(schema.tasks.status, 'COMPLETED'),
+          gte(schema.tasks.completedAt, startOfDay.getTime()),
+          lte(schema.tasks.completedAt, endOfDay.getTime()),
+        ),
+      })
+      .sync()
   }
 
   static search(query: string) {
-    return getDatabase().query.tasks.findMany({
-      where: and(
-        eq(schema.tasks.status, 'PENDING'),
-        like(schema.tasks.title, `%${query.toLowerCase()}%`),
-      ),
-    }).sync()
+    return getDatabase()
+      .query.tasks.findMany({
+        where: and(
+          eq(schema.tasks.status, 'PENDING'),
+          like(schema.tasks.title, `%${query.toLowerCase()}%`),
+        ),
+      })
+      .sync()
   }
 }

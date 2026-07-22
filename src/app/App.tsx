@@ -13,14 +13,7 @@ import NotepadView from '@features/notepad/components/NotepadView'
 import VisualsView from '@features/visuals/components/VisualsView'
 
 type ViewType =
-  | 'dashboard'
-  | 'all'
-  | 'upcoming'
-  | 'completed'
-  | 'statistics'
-  | 'settings'
-  | 'notepad'
-  | 'visuals'
+  'dashboard' | 'all' | 'upcoming' | 'completed' | 'statistics' | 'settings' | 'notepad' | 'visuals'
 
 function App() {
   const [currentView, setCurrentView] = useState<ViewType>('dashboard')

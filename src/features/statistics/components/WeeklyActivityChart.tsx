@@ -1,18 +1,18 @@
-import React from 'react';
+import React from 'react'
 
 export interface WeeklyStat {
-  day: string;
-  count: number;
+  day: string
+  count: number
 }
 
 interface WeeklyActivityChartProps {
-  weekly: WeeklyStat[];
+  weekly: WeeklyStat[]
 }
 
 export const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({ weekly }) => {
-  const maxWeeklyCount = Math.max(...weekly.map((w) => w.count), 1);
-  const weekDaysOrder = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const currentDayIdx = new Date().getDay();
+  const maxWeeklyCount = Math.max(...weekly.map((w) => w.count), 1)
+  const weekDaysOrder = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  const currentDayIdx = new Date().getDay()
 
   return (
     <div className="bg-workspace-card/90 backdrop-blur-xl rounded-2xl p-6 border border-workspace-border/60 shadow-sm">
@@ -24,11 +24,11 @@ export const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({ weekly
       </div>
       <div className="h-64 flex items-end justify-between px-2 pt-6">
         {weekly.map((w) => {
-          const dayIdx = weekDaysOrder.indexOf(w.day);
-          const isToday = dayIdx === currentDayIdx;
-          const isFuture = dayIdx > currentDayIdx;
+          const dayIdx = weekDaysOrder.indexOf(w.day)
+          const isToday = dayIdx === currentDayIdx
+          const isFuture = dayIdx > currentDayIdx
 
-          const pct = isFuture ? 4 : (w.count / maxWeeklyCount) * 80 + 5; // height percentage
+          const pct = isFuture ? 4 : (w.count / maxWeeklyCount) * 80 + 5 // height percentage
 
           return (
             <div
@@ -41,8 +41,8 @@ export const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({ weekly
                   isToday
                     ? 'bg-workspace-primary shadow-sm shadow-workspace-primary/40'
                     : isFuture
-                    ? 'bg-workspace-border/40 border border-dashed border-workspace-border'
-                    : 'bg-workspace-primary/70 hover:bg-workspace-primary'
+                      ? 'bg-workspace-border/40 border border-dashed border-workspace-border'
+                      : 'bg-workspace-primary/70 hover:bg-workspace-primary'
                 }`}
                 style={{ height: `${pct}%`, minHeight: '6px' }}
               >
@@ -56,16 +56,16 @@ export const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({ weekly
                   isToday
                     ? 'text-workspace-primary font-bold'
                     : isFuture
-                    ? 'text-workspace-text-secondary/40'
-                    : 'text-workspace-text-secondary'
+                      ? 'text-workspace-text-secondary/40'
+                      : 'text-workspace-text-secondary'
                 }`}
               >
                 {w.day}
               </span>
             </div>
-          );
+          )
         })}
       </div>
     </div>
-  );
-};
+  )
+}

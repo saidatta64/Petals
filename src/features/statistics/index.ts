@@ -1,1 +1,1 @@
-export { default as StatisticsView } from './components/StatisticsView';
+export { default as StatisticsView } from './components/StatisticsView'

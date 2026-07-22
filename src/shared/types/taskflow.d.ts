@@ -50,7 +50,12 @@ export interface TaskflowAPI {
     read: (filename: string) => Promise<string>
     write: (filename: string, content: string) => Promise<{ success: boolean; path: string }>
     delete: (filename: string) => Promise<{ success: boolean }>
-    openExternalDialog: () => Promise<{ path: string; filename: string; content: string; updatedAt: number } | null>
+    openExternalDialog: () => Promise<{
+      path: string
+      filename: string
+      content: string
+      updatedAt: number
+    } | null>
     readExternal: (filePath: string) => Promise<string>
     writeExternal: (filePath: string, content: string) => Promise<{ success: boolean }>
     openInExplorer: (filePath?: string) => Promise<{ success: boolean }>

@@ -51,7 +51,7 @@ export default function Dashboard() {
       if (selected) {
         setDbPath(selected)
         alert(
-          'Database location selected! The app will now restart to initialize data in the new location.'
+          'Database location selected! The app will now restart to initialize data in the new location.',
         )
         window.taskflow.app.relaunch()
       }
@@ -68,13 +68,10 @@ export default function Dashboard() {
     }
   }
 
-  const pendingTasks = useMemo(
-    () => todayTasks.filter((t) => t.status === 'PENDING'),
-    [todayTasks]
-  )
+  const pendingTasks = useMemo(() => todayTasks.filter((t) => t.status === 'PENDING'), [todayTasks])
   const completedTodayTasks = useMemo(
     () => todayTasks.filter((t) => t.status === 'COMPLETED'),
-    [todayTasks]
+    [todayTasks],
   )
 
   const pendingCount = pendingTasks.length
@@ -88,7 +85,7 @@ export default function Dashboard() {
           const d = new Date(t.completedAt!)
           d.setHours(0, 0, 0, 0)
           return d.getTime()
-        })
+        }),
     )
 
     let streak = 0

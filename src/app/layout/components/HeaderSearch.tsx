@@ -1,34 +1,34 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Search, CheckCircle2, Circle } from 'lucide-react';
-import { useTaskStore } from '../../../shared/stores/taskStore';
+import React, { useState, useEffect, useRef } from 'react'
+import { Search, CheckCircle2, Circle } from 'lucide-react'
+import { useTaskStore } from '../../../shared/stores/taskStore'
 
 export const HeaderSearch: React.FC = () => {
-  const [query, setQuery] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const tasks = useTaskStore((state) => state.tasks);
-  const toggleComplete = useTaskStore((state) => state.toggleComplete);
+  const [query, setQuery] = useState('')
+  const [isOpen, setIsOpen] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const tasks = useTaskStore((state) => state.tasks)
+  const toggleComplete = useTaskStore((state) => state.toggleComplete)
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        inputRef.current?.focus();
+        e.preventDefault()
+        inputRef.current?.focus()
       }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   const results = query
     ? tasks
         .filter(
           (t) =>
             t.title.toLowerCase().includes(query.toLowerCase()) ||
-            t.description?.toLowerCase().includes(query.toLowerCase())
+            t.description?.toLowerCase().includes(query.toLowerCase()),
         )
         .slice(0, 5)
-    : [];
+    : []
 
   return (
     <div className="flex-1 max-w-xl">
@@ -45,8 +45,8 @@ export const HeaderSearch: React.FC = () => {
           type="text"
           value={query}
           onChange={(e) => {
-            setQuery(e.target.value);
-            setIsOpen(true);
+            setQuery(e.target.value)
+            setIsOpen(true)
           }}
           onFocus={() => setIsOpen(true)}
           onBlur={() => setTimeout(() => setIsOpen(false), 200)}
@@ -72,9 +72,9 @@ export const HeaderSearch: React.FC = () => {
                     key={task.id}
                     className="flex items-center gap-3 px-4 py-2.5 hover:bg-workspace-border/50 cursor-pointer transition-colors"
                     onClick={() => {
-                      toggleComplete(task.id);
-                      setQuery('');
-                      setIsOpen(false);
+                      toggleComplete(task.id)
+                      setQuery('')
+                      setIsOpen(false)
                     }}
                   >
                     {task.status === 'COMPLETED' ? (
@@ -105,5 +105,5 @@ export const HeaderSearch: React.FC = () => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}

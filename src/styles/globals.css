@@ -17,34 +17,35 @@ html {
 }
 
 :root {
-  --workspace-bg: #F4F4F5;
+  --workspace-bg: #f4f4f5;
   --workspace-sidebar: rgba(255, 255, 255, 0.75);
   --workspace-card: rgba(255, 255, 255, 0.85);
   --workspace-border: rgba(0, 0, 0, 0.08);
-  --workspace-text: #09090B;
-  --workspace-text-secondary: #71717A;
+  --workspace-text: #09090b;
+  --workspace-text-secondary: #71717a;
 }
 
 html.dark {
-  --workspace-bg: #09090B;
+  --workspace-bg: #09090b;
   --workspace-sidebar: rgba(18, 18, 20, 0.82);
   --workspace-card: rgba(30, 30, 35, 0.72);
   --workspace-border: rgba(255, 255, 255, 0.06);
-  --workspace-text: #FAFAFA;
-  --workspace-text-secondary: #A1A1AA;
+  --workspace-text: #fafafa;
+  --workspace-text-secondary: #a1a1aa;
 }
 
 body {
   background-color: theme('colors.workspace.bg');
-  background-image: 
+  background-image:
     radial-gradient(circle at 15% 50%, rgba(79, 140, 255, 0.08), transparent 25%),
     radial-gradient(circle at 85% 30%, rgba(124, 92, 255, 0.08), transparent 25%);
   color: theme('colors.workspace.text');
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
   min-height: 100vh;
   overflow-x: hidden;
 }
-
 
 body.dark {
   background-color: theme('colors.workspace.bg');

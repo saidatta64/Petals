@@ -1,12 +1,13 @@
-import React from 'react';
-import { Button } from '@heroui/react';
-import { StreakWidget } from '@features/widgets/components/StreakWidget';
-import { getGreetingTitle, getGreetingSubtext } from '@shared/utils/greetingUtils';
+import React from 'react'
+import { Button } from '@heroui/react'
+import { Plus } from 'lucide-react'
+import { StreakWidget } from '@features/widgets/components/StreakWidget'
+import { getGreetingTitle, getGreetingSubtext } from '@shared/utils/greetingUtils'
 
 interface DashboardHeroProps {
-  username: string | null;
-  currentStreak: number;
-  onNewTaskClick: () => void;
+  username: string | null
+  currentStreak: number
+  onNewTaskClick: () => void
 }
 
 export const DashboardHero: React.FC<DashboardHeroProps> = ({
@@ -14,8 +15,8 @@ export const DashboardHero: React.FC<DashboardHeroProps> = ({
   currentStreak,
   onNewTaskClick,
 }) => {
-  const { title, emoji } = getGreetingTitle(username);
-  const subtext = getGreetingSubtext();
+  const { title, emoji } = getGreetingTitle(username)
+  const subtext = getGreetingSubtext()
 
   return (
     <section className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
@@ -31,8 +32,8 @@ export const DashboardHero: React.FC<DashboardHeroProps> = ({
             onPress={onNewTaskClick}
             className="h-11 px-5 font-bold text-sm rounded-xl bg-workspace-card border border-workspace-border text-workspace-text hover:bg-workspace-border/60 hover:text-workspace-text transition-all flex items-center justify-center gap-2.5 shadow-sm"
           >
-            <div className="w-4 h-4 rounded-full bg-workspace-primary/20 flex items-center justify-center text-workspace-primary font-bold text-xs">
-              +
+            <div className="w-5 h-5 rounded-full bg-workspace-primary/15 flex items-center justify-center text-workspace-primary flex-shrink-0">
+              <Plus size={13} className="stroke-[2.5]" />
             </div>
             New Task
           </Button>
@@ -44,6 +45,5 @@ export const DashboardHero: React.FC<DashboardHeroProps> = ({
         <StreakWidget currentStreak={currentStreak} />
       </div>
     </section>
-  );
-};
-
+  )
+}
