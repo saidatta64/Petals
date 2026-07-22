@@ -3,9 +3,10 @@ import TaskCard from '@features/tasks/components/TaskCard'
 
 interface TaskListProps {
   tasks: Task[]
-  onComplete: (id: number) => void
-  onDelete: (id: number) => void
+  onComplete?: (id: number) => void
+  onDelete?: (id: number) => void
   emptyMessage?: string
+  showCheckbox?: boolean
 }
 
 export default function TaskList({
@@ -13,6 +14,7 @@ export default function TaskList({
   onComplete,
   onDelete,
   emptyMessage = 'No tasks found',
+  showCheckbox = true,
 }: TaskListProps) {
   if (tasks.length === 0) {
     return (
@@ -30,6 +32,7 @@ export default function TaskList({
           task={task}
           onComplete={onComplete}
           onDelete={onDelete}
+          showCheckbox={showCheckbox}
         />
       ))}
     </div>

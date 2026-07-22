@@ -6,9 +6,16 @@ interface TasksViewProps {
   subtitle: string
   tasks: Task[]
   emptyMessage: string
+  showCheckbox?: boolean
 }
 
-export default function TasksView({ title, subtitle, tasks, emptyMessage }: TasksViewProps) {
+export default function TasksView({
+  title,
+  subtitle,
+  tasks,
+  emptyMessage,
+  showCheckbox = true,
+}: TasksViewProps) {
   const toggleComplete = useTaskStore((state) => state.toggleComplete)
   const removeTask = useTaskStore((state) => state.removeTask)
   const isLoading = useTaskStore((state) => state.isLoading)
@@ -30,6 +37,7 @@ export default function TasksView({ title, subtitle, tasks, emptyMessage }: Task
           onComplete={toggleComplete}
           onDelete={removeTask}
           emptyMessage={emptyMessage}
+          showCheckbox={showCheckbox}
         />
       )}
     </div>

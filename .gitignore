@@ -9,4 +9,4 @@ release/
 !.env.example
 .cursor/
 .codex-plugin/
-new_ui.md
+docs/

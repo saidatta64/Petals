@@ -4,11 +4,12 @@ import { useCategoryStore } from '@shared/stores/categoryStore'
 
 interface TaskCardProps {
   task: Task
-  onComplete: (id: number) => void
-  onDelete: (id: number) => void
+  onComplete?: (id: number) => void
+  onDelete?: (id: number) => void
+  showCheckbox?: boolean
 }
 
-export default function TaskCard({ task, onComplete, onDelete }: TaskCardProps) {
+export default function TaskCard({ task, onComplete, onDelete, showCheckbox = true }: TaskCardProps) {
   const categories = useCategoryStore((state) => state.getCategories())
   const category = categories.find((c) => c.id === task.categoryId)
 
@@ -36,13 +37,15 @@ export default function TaskCard({ task, onComplete, onDelete }: TaskCardProps) 
         task.status === 'COMPLETED' ? 'opacity-50' : ''
       }`}
     >
-      {/* Checkbox */}
-      <input
-        type="checkbox"
-        checked={task.status === 'COMPLETED'}
-        onChange={() => onComplete(task.id)}
-        className="w-5 h-5 rounded cursor-pointer"
-      />
+      {/* Checkbox / Checkpoint */}
+      {showCheckbox && (
+        <input
+          type="checkbox"
+          checked={task.status === 'COMPLETED'}
+          onChange={() => onComplete?.(task.id)}
+          className="w-5 h-5 rounded cursor-pointer"
+        />
+      )}
 
       {/* Content */}
       <div className="flex-1">
@@ -89,7 +92,7 @@ export default function TaskCard({ task, onComplete, onDelete }: TaskCardProps) 
 
         {/* Delete Button */}
         <button
-          onClick={() => onDelete(task.id)}
+          onClick={() => onDelete?.(task.id)}
           className="p-1 hover:bg-light-bg dark:hover:bg-dark-bg rounded transition-colors text-light-text-secondary dark:text-dark-text-secondary hover:text-light-danger dark:hover:text-dark-danger"
         >
           <Trash2 size={16} />

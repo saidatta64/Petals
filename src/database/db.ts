@@ -2,6 +2,7 @@ import Database from 'better-sqlite3'
 import type { Database as SqliteDatabase } from 'better-sqlite3'
 import { drizzle, BetterSQLite3Database } from 'drizzle-orm/better-sqlite3'
 import path from 'path'
+import fs from 'fs'
 import { app } from 'electron'
 import * as schema from './schema'
 
@@ -21,6 +22,12 @@ export function initializeDatabase(customDir?: string) {
       userDataPath = path.join(path.dirname(userDataPath), 'TaskFlow')
     }
     dbPath = path.join(userDataPath, "taskflow.db")
+  }
+
+  // Automatically create directory if it doesn't exist
+  const targetFolder = path.dirname(dbPath)
+  if (!fs.existsSync(targetFolder)) {
+    fs.mkdirSync(targetFolder, { recursive: true })
   }
 
   const sqlite = new Database(dbPath)

@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
-import { WorkspaceLayout } from './layout/WorkspaceLayout'
-import { ArcSidebar } from './layout/ArcSidebar'
-import { MinimalHeader } from './layout/MinimalHeader'
+import { WorkspaceLayout, ArcSidebar, MinimalHeader } from './layout'
 import Dashboard from '@features/dashboard/components/Dashboard'
 import TasksView from '@features/tasks/components/TasksView'
 import TaskDialog from '@features/tasks/components/TaskDialog'
@@ -41,7 +39,7 @@ function App() {
     loadTheme()
     loadTasks()
     loadCategories()
-    
+
     // Load default view setting
     async function loadStartupView() {
       if (window.taskflow) {
@@ -69,6 +67,7 @@ function App() {
             subtitle="Focus on what matters today."
             tasks={getTodayTasks()}
             emptyMessage="No tasks for today. Add one to get started!"
+            showCheckbox={false}
           />
         )
       case 'upcoming':
@@ -96,9 +95,7 @@ function App() {
       <WorkspaceLayout
         fullBleed={currentView === 'notepad' || currentView === 'visuals'}
         sidebar={<ArcSidebar currentView={currentView} onViewChange={setCurrentView} />}
-        header={
-          <MinimalHeader isDarkMode={isDarkMode} onToggleTheme={toggleTheme} />
-        }
+        header={<MinimalHeader isDarkMode={isDarkMode} onToggleTheme={toggleTheme} />}
       >
         {renderView()}
       </WorkspaceLayout>
@@ -108,4 +105,3 @@ function App() {
 }
 
 export default App
-

@@ -1,0 +1,53 @@
+import React from 'react';
+import { Button } from '@heroui/react';
+import { StreakWidget } from '@features/widgets/components/StreakWidget';
+import { getGreetingTitle, getGreetingSubtext } from '@shared/utils/greetingUtils';
+
+interface DashboardHeroProps {
+  username: string | null;
+  pendingCount: number;
+  totalTodayTasks: number;
+  currentStreak: number;
+  onNewTaskClick: () => void;
+}
+
+export const DashboardHero: React.FC<DashboardHeroProps> = ({
+  username,
+  pendingCount,
+  totalTodayTasks,
+  currentStreak,
+  onNewTaskClick,
+}) => {
+  const { title, emoji } = getGreetingTitle(username);
+  const subtext = getGreetingSubtext(pendingCount, totalTodayTasks, currentStreak);
+
+  return (
+    <section className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="flex flex-col gap-3 flex-1 min-w-0">
+        <h1 className="text-4xl font-bold tracking-tight text-workspace-text font-brand">
+          {title} {emoji}
+        </h1>
+        <p className="text-workspace-text-secondary text-base max-w-xl leading-relaxed">
+          {subtext}
+        </p>
+        <div className="flex items-center gap-4 mt-2">
+          <Button
+            onPress={onNewTaskClick}
+            className="h-11 px-5 font-bold text-sm rounded-xl bg-workspace-card border border-workspace-border text-workspace-text hover:bg-workspace-border/60 hover:text-workspace-text transition-all flex items-center justify-center gap-2.5 shadow-sm"
+          >
+            <div className="w-4 h-4 rounded-full bg-workspace-primary/20 flex items-center justify-center text-workspace-primary font-bold text-xs">
+              +
+            </div>
+            New Task
+          </Button>
+        </div>
+      </div>
+
+      {/* Streak Widget placed on the right side of Hero */}
+      <div className="w-full md:w-80 flex-shrink-0">
+        <StreakWidget currentStreak={currentStreak} />
+      </div>
+    </section>
+  );
+};
+
