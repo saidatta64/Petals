@@ -1,4 +1,4 @@
-# 🌸 Petals
+# ![logo](public/icon.png) Petals
 
 > **A modern, desktop-first productivity application focused on consistency, privacy, and seamless workflow management.**
 
